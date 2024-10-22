@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link href="/css/index.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="container">
+      <div class="login">
+        <div class="login__content">
+          <img class="login__img" src="/img/buildings.jpg" alt="Login image" />
+
+<!-- Login Form -->
+          <form class="login__form" id="loginForm">
+            <div>
+              <h1 class="login__title">
+                <span>Welcome</span> Back
+              </h1>
+              <p class="login__description">
+                Welcome! Please login to continue.
+              </p>
+            </div>
+
+            <div class="login__inputs">
+              <div>
+                <label for="email" class="login__label">Email</label>
+                <input class="login__input" type="email" id="email" placeholder="Enter your email address" required />
+              </div>
+              <div>
+                <label for="password" class="login__label">Password</label>
+                <div class="login__box">
+                  <input class="login__input" type="password" id="password" placeholder="Enter your password" required />
+                  <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="login__buttons">
+              <button type="button" class="login__button" id="loginBtn">Log In</button>
+              <button type="button" class="login__button login__button-ghost" id="toggleSignUp">Sign Up</button>
+            </div>
+
+            <a class="login__forgot" href="#">Forgot Password?</a>
+          </form>
+
+<!-- Sign Up Form (Hidden by default) -->
+          <form class="login__form" id="signUpForm" style="display: none;">
+            <div>
+              <h1 class="login__title">
+                <span>Create</span> an account
+              </h1>
+              <p class="login__description">
+                Sign up to start using our services.
+              </p>
+            </div>
+
+            <div class="login__inputs">
+              <div>
+                <label for="firstName" class="login__label">First Name</label>
+                <input class="login__input" type="text" id="firstName" placeholder="Enter your first name" required />
+              </div>
+              <div>
+                <label for="lastName" class="login__label">Last Name</label>
+                <input class="login__input" type="text" id="lastName" placeholder="Enter your last name" required />
+              </div>
+              <div>
+                <label for="signUpEmail" class="login__label">Email</label>
+                <input class="login__input" type="email" id="signUpEmail" placeholder="Enter your email address" required />
+              </div>
+              <div>
+                <label for="signUpPassword" class="login__label">Password</label>
+                <div class="login__box">
+                  <input class="login__input" type="password" id="signUpPassword" placeholder="Create a password" required />
+                  <i class="ri-eye-off-line login__eye" id="signUpIcon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="login__buttons">
+              <button type="button" class="login__button" id="signUpBtn">Sign Up</button>
+              <button type="button" class="login__button login__button-ghost" id="toggleLogin">Log In</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  
+  <!-- INDEX JS -->
+  <script src="/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="/css/dashboad.css" rel="stylesheet" type="text/css">
+
+    <%- include('../views/templates/sidebar.ejs') %>
+
+    <!-- Contenedor principal -->
+        <div class="container">
+            <!-- Área central dinámica -->
+            <main class="content">
+                <h1>Welcome to Rocket MOST</h1>
+                <div class="button-grid">
+                    <!-- Botón dinámico con imagen -->
+                    <button class="dynamic-button">
+                        <img src="/img/buildings.jpg" alt="Placeholder image">
+                        <span>Dynamic Button 1</span>
+                    </button>
+                    <button class="dynamic-button">
+                        <img src="/img/buildings.jpg" alt="Placeholder image">
+                        <span>Dynamic Button 2</span>
+                    </button>
+                    <button class="dynamic-button">
+                        <img src="/img/buildings.jpg" alt="Placeholder image">
+                        <span>Dynamic Button 2</span>
+                    </button>
+                    <!-- Más botones se pueden agregar dinámicamente aquí -->
+                </div>
+            </main>
+        </div>
+
+    <!-- Incluye Remixicon para íconos -->
+    <script src="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
