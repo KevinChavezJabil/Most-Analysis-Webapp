@@ -14,6 +14,10 @@ app.get('/dashboard', (req, res) => {
     res.render('dashboard')
 });
 
+app.get('/projects', (req, res) => {
+    res.render('projects')
+});
+
 app.get('/settings', (req, res) => {
     res.render('settings')
 });
