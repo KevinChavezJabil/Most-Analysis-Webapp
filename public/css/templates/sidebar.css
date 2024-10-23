@@ -8,10 +8,10 @@
   --nav-width: 68px;
 
   /* Colores */
-  --first-color: #163e6a; /* Color morado para los íconos y elementos principales */
-  --first-color-light: #AFA5D9; /* Color más claro de acento */
+  --first-color: #163e6a;
+  --first-color-light: #AFA5D9;
   --white-color: #ffffff;
-  --light-gray-color: #f7f5ff; /* Nuevo color de fondo tenue grisáceo */
+  --light-gray-color: #f7f5ff;
   --text-color: hsl(244, 4%, 36%);
   --title-color: hsl(244, 12%, 12%);
 
@@ -39,15 +39,19 @@
   margin: 0;
 }
 
+.hide {
+  display: none;
+}
+
 body {
   position: relative;
   margin: var(--header-height) 0 0 0;
-  padding: 0 1rem;
+  padding: 0; /* Eliminado el padding */
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
-  background-color: var(--light-gray-color); /* Se aplica el nuevo color de fondo */
+  background-color: var(--light-gray-color);
   color: var(--text-color);
-  transition: 0.5s;
+  transition: padding-left 0.5s; /* Transición para el padding */
 }
 
 a {
@@ -68,7 +72,6 @@ a {
   padding: 0 1rem;
   background-color: var(--white-color);
   z-index: var(--z-fixed);
-  transition: 0.5s;
 }
 
 .header__toggle {
@@ -95,13 +98,13 @@ a {
 .l-navbar {
   position: fixed;
   top: 0;
-  left: -30%;
-  width: var(--nav-width);
+  left: 0; /* Siempre visible */
+  width: calc(var(--nav-width) + 156px); /* Ancho fijo */
   height: 100vh;
-  background-color: var(--first-color); /* Fondo morado en el navbar */
-  padding: 0.5rem 1rem 0 0;
-  transition: 0.5s;
+  background-color: var(--first-color);
+  padding: 1rem 1rem 0 0;
   z-index: var(--z-fixed);
+  transition: width 0.5s; /* Transición para el cambio de tamaño */
 }
 
 .nav {
@@ -139,7 +142,6 @@ a {
   position: relative;
   color: var(--first-color-light);
   margin-bottom: 1.5rem;
-  transition: 0.3s;
 }
 
 .nav__link:hover {
@@ -150,14 +152,9 @@ a {
   font-size: 1.25rem;
 }
 
-/* Mostrar navbar en dispositivos móviles */
-.show {
-  left: 0;
-}
-
 /* Añadir padding al body cuando el navbar esté visible */
 .body-pd {
-  padding-left: calc(var(--nav-width) + 1rem);
+  padding-left: calc(var(--nav-width) + 188px);
 }
 
 /* Enlaces activos */
@@ -177,13 +174,13 @@ a {
 /*===== MEDIA QUERIES =====*/
 @media screen and (min-width: 768px) {
   body {
-    margin: calc(var(--header-height) + 1rem) 0 0 0;
-    padding-left: calc(var(--nav-width) + 2rem);
+    margin: calc(var(--header-height) + 0rem) 0 0 0;
+    padding-left: calc(var(--nav-width) + 0rem);
   }
 
   .header {
     height: calc(var(--header-height) + 1rem);
-    padding: 0 2rem 0 calc(var(--nav-width) + 2rem);
+    padding: 0 2rem 0 calc(var(--nav-width) + 0rem);
   }
 
   .header__img {
@@ -208,5 +205,25 @@ a {
   /* Añadir padding al body en escritorio */
   .body-pd {
     padding-left: calc(var(--nav-width) + 188px);
+  }
+}
+
+/* Ajustes para pantallas pequeñas */
+@media screen and (max-width: 767px) {
+  .l-navbar {
+    width: var(--nav-width); /* Reducir el ancho en pantallas pequeñas */
+    z-index: var(--z-fixed); /* Asegurar que esté por encima de otros elementos */
+  }
+
+  .show {
+    width: calc(var(--nav-width) + 156px); /* Ancho completo cuando se muestra */
+  }
+
+  .body-pd {
+    padding-left: var(--nav-width); /* Ajustar el padding-left en pantallas pequeñas */
+  }
+
+  .body-pd.show {
+    padding-left: calc(var(--nav-width) + 156px); /* Ajustar el padding-left cuando la barra está visible */
   }
 }

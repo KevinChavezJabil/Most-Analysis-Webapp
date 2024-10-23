@@ -1,32 +1,37 @@
-/*===== SHOW NAVBAR  =====*/ 
-const showNavbar = (toggleId, navId, bodyId, headerId) =>{
+const showNavbar = (toggleId, navId, bodyId, headerId) => {
     const toggle = document.getElementById(toggleId),
-    nav = document.getElementById(navId),
-    bodypd = document.getElementById(bodyId),
-    headerpd = document.getElementById(headerId)
+        nav = document.getElementById(navId),
+        bodypd = document.getElementById(bodyId),
+        headerpd = document.getElementById(headerId);
 
-    // Validate that all variables exist
-    if(toggle && nav && bodypd && headerpd){
-        // Add classes to show navbar by default
-        nav.classList.add('show')
-        toggle.classList.add('bx-x')
-        bodypd.classList.add('body-pd')
-        headerpd.classList.add('body-pd')
+    const handleResize = () => {
+        if (window.innerWidth >= 768) {
+            // En pantallas grandes, la barra debe estar siempre visible sin animación desde el inicio.
+            nav.classList.add('show');
+            toggle.classList.add('hide');  // Ocultar el ícono del toggle en pantallas grandes.
+            bodypd.classList.add('body-pd');
+            headerpd.classList.add('body-pd');
+        } else {
+            // En pantallas pequeñas, permite abrir y cerrar con animación.
+            nav.classList.remove('show');
+            toggle.classList.remove('hide');  // Mostrar el ícono del toggle.
+            bodypd.classList.remove('body-pd');
+            headerpd.classList.remove('body-pd');
+        }
+    };
 
-        toggle.addEventListener('click', ()=>{
-            // show/hide navbar
-            nav.classList.toggle('show')
-            // change icon
-            toggle.classList.toggle('bx-x')
-            // add/remove padding to body
-            bodypd.classList.toggle('body-pd')
-            // add/remove padding to header
-            headerpd.classList.toggle('body-pd')
-        })
-    }
-}
+    // Llama la función al iniciar para ajustar la barra según el tamaño de la pantalla
+    handleResize();
 
-showNavbar('header-toggle','nav-bar','body-pd','header')
+    // Escucha los cambios de tamaño de la ventana
+    window.addEventListener('resize', handleResize);
+};
+
+// Mostrar barra desde el inicio (sin esperar animación) en pantallas grandes
+document.addEventListener('DOMContentLoaded', () => {
+    showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header');
+});
+
 
 /*===== LINK ACTIVE  =====*/ 
 // Obtener todas las opciones de navegación
