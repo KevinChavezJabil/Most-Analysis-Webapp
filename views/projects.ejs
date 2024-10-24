@@ -5,35 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My projects</title>
     <link href="/css/projects.css" rel="stylesheet" type="text/css">
-
+</head>
+<body>
     <%- include('../views/templates/sidebar.ejs') %>
 
-    <!-- Contenedor principal -->
-        <div class="container">
-            <!-- Área central dinámica -->
-            <main class="content">
-                <h1>Welcome to Rocket MOST</h1>
-                <div class="button-grid">
-                    <!-- Botón dinámico con imagen -->
-                    <button class="dynamic-button">
-                        <img src="/img/buildings.jpg" alt="Placeholder image">
-                        <span>Dynamic Button 1</span>
-                    </button>
-                    <button class="dynamic-button">
-                        <img src="/img/buildings.jpg" alt="Placeholder image">
-                        <span>Dynamic Button 2</span>
-                    </button>
-                    <button class="dynamic-button">
-                        <img src="/img/buildings.jpg" alt="Placeholder image">
-                        <span>Dynamic Button 2</span>
-                    </button>
-                    <!-- Más botones se pueden agregar dinámicamente aquí -->
-                </div>
-            </main>
-        </div>
+    <div class="container">
+        <!-- Área central dinámica -->
+        <main class="content">
+            <div class="image-container">
+                <img class="login__img" src="/img/p4.png" alt="Login image" />
+            </div>
+            <div class="projects-container">
+                <div class="projects-rectangle">
+                    <a href="/new-project" class="create-button">+ Create a new project</a>
 
-    <!-- Incluye Remixicon para íconos -->
+                    <!-- Nueva barra de búsqueda -->
+                    <div class="wrapper">
+                        <div class="search-bar">
+                            <div class="icon"><img src="/img/search.png" width="25px" height="25px"></div>
+                            <input type="text" placeholder="Search projects...">
+                            <div class="delete-btn">&#10006;</div>
+                            <div class="autocom-box">
+                                <!-- Las sugerencias se cargarán aquí dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <h1>Recent projects</h1>
+                    <div class="button-grid">
+                        <button class="dynamic-button">
+                            <img src="/img/buildings.jpg" alt="Placeholder image">
+                            <h3>Project 1</h3>
+                            <h4>24/Oct/2024</h4>
+                        </button>
+                        <button class="dynamic-button">
+                            <img src="/img/buildings.jpg" alt="Placeholder image">
+                            <h3>Project 2</h3>
+                            <h4>24/Oct/2024</h4>
+                        </button>
+                        <button class="dynamic-button">
+                            <img src="/img/buildings.jpg" alt="Placeholder image">
+                            <h3>Project 3</h3>
+                            <h4>24/Oct/2024</h4>
+                        </button>
+                        <!-- Más botones se pueden agregar dinámicamente aquí -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.js"></script>
-    <script src="/js/dashboard.js"></script>
+    <script src="/js/projects.js"></script>
+    <script src="/js/suggestions.js"></script>
 </body>
 </html>

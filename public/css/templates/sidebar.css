@@ -9,6 +9,7 @@
   /*===== Colors =====*/
   --first-color: #163e6a;
   --second-color: #537091;
+  --third-color: #cfd3da;
   --title-color: hsl(244, 12%, 12%);
   --text-color: hsl(244, 4%, 36%);
   --body-color: #ffffff;
@@ -169,6 +170,7 @@ a {
   .header {
     height: calc(var(--header-height) + 1rem);
     padding: 0 2rem 0 calc(var(--nav-width) + 0rem);
+    border-bottom: 1px solid var(--third-color);
   }
 
   .l-navbar {
