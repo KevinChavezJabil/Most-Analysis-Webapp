@@ -3,20 +3,15 @@
 
 /* VARIABLES CSS */
 :root {
-  /* Colores */
   --first-color: #163e6a;
   --second-color: #537091;
   --title-color: hsl(244, 12%, 12%);
   --text-color: hsl(244, 4%, 36%);
   --body-color: #ffffff;
-
-  /* Tipografía */
   --body-font: 'Poppins', sans-serif;
   --h1-font-size: 4rem;
   --p-font-size: 1.25rem;
   --cta-font-size: 1rem;
-
-  /* Font weight */
   --font-medium: 500;
   --font-semi-bold: 600;
   --font-bold: 800;
@@ -34,7 +29,9 @@ body {
   font-family: var(--body-font);
   color: var(--text-color);
   display: flex;
-  height: 100vh;
+  justify-content: center;
+  align-items: flex-start; /* Alinea los elementos al inicio del contenedor */
+  min-height: 100vh;
   margin: 0;
 }
 
@@ -43,39 +40,51 @@ img {
   height: auto;
 }
 
-.container {
+.main-container {
   display: flex;
-  flex-grow: 1;
-  justify-content: center;
-  align-items: top; /* Cambiado de top a center para centrar verticalmente */
-  background-color: var(--body-color);
-  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  width: 100%;
 }
 
-.container img {
-  width: auto;
-  height: auto; /* Mantiene la proporción de la imagen */
-  max-height: auto; /* Puedes ajustar la altura máxima para no desbordar el contenedor */
-  object-fit: cover; /* Esto hace que la imagen cubra todo el espacio del contenedor */
-  margin-bottom: 20px; /* Separación entre la imagen y el texto */
+.image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.image-container img {
+  width: 100%;
+  max-height: 500px; /* Ajuste la altura máxima */
+  object-fit: cover; /* Asegura que la imagen cubra el espacio sin deformarse */
+}
+
+.text-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0;
+  margin-top: 0px; /* Distancia fija entre la imagen y el texto */
 }
 
 .hero-content {
   max-width: 800px;
-
+  padding: 20px;
 }
 
 .hero-content h1 {
   font-size: var(--h1-font-size);
-  font-weight: var(--font-bold); /* Cambiado a la versión más bold */
-  color: var(--first-color); /* Puedes ajustar el color si lo prefieres */
+  font-weight: var(--font-bold);
+  color: var(--first-color);
   margin-bottom: 20px;
 }
 
 .hero-content p {
   font-size: var(--p-font-size);
   line-height: 1.6;
-  color: var(--text-color); /* Texto en color secundario */
+  color: var(--text-color);
   margin-bottom: 30px;
 }
 
@@ -93,4 +102,35 @@ img {
 
 .cta-button:hover {
   background-color: #0e2b4e;
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 768px) {
+  .image-container img {
+    max-height: 300px; /* Ajusta la altura en pantallas pequeñas */
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem; /* Ajusta el tamaño de fuente en pantallas pequeñas */
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .cta-button {
+    font-size: 0.875rem;
+    padding: 10px 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 2rem; /* Ajuste adicional para pantallas extra pequeñas */
+  }
+
+  .cta-button {
+    font-size: 0.75rem;
+    padding: 8px 15px;
+  }
 }

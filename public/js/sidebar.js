@@ -1,37 +1,48 @@
+/*===== SHOW NAVBAR  =====*/ 
 const showNavbar = (toggleId, navId, bodyId, headerId) => {
     const toggle = document.getElementById(toggleId),
         nav = document.getElementById(navId),
         bodypd = document.getElementById(bodyId),
         headerpd = document.getElementById(headerId);
 
-    const handleResize = () => {
-        if (window.innerWidth >= 768) {
-            // En pantallas grandes, la barra debe estar siempre visible sin animación desde el inicio.
-            nav.classList.add('show');
-            toggle.classList.add('hide');  // Ocultar el ícono del toggle en pantallas grandes.
-            bodypd.classList.add('body-pd');
-            headerpd.classList.add('body-pd');
-        } else {
-            // En pantallas pequeñas, permite abrir y cerrar con animación.
-            nav.classList.remove('show');
-            toggle.classList.remove('hide');  // Mostrar el ícono del toggle.
-            bodypd.classList.remove('body-pd');
-            headerpd.classList.remove('body-pd');
-        }
-    };
+    // Validate that all variables exist
+    if (toggle && nav && bodypd && headerpd) {
+        toggle.addEventListener('click', () => {
+            // Toggle navbar
+            nav.classList.toggle('show');
+            // Add padding to body
+            bodypd.classList.toggle('body-pd');
+            // Add padding to header
+            headerpd.classList.toggle('body-pd');
 
-    // Llama la función al iniciar para ajustar la barra según el tamaño de la pantalla
-    handleResize();
-
-    // Escucha los cambios de tamaño de la ventana
-    window.addEventListener('resize', handleResize);
+            // Save the state in localStorage
+            if (nav.classList.contains('show')) {
+                localStorage.setItem('navbarState', 'show');
+            } else {
+                localStorage.setItem('navbarState', 'hide');
+            }
+        });
+    }
 };
 
-// Mostrar barra desde el inicio (sin esperar animación) en pantallas grandes
-document.addEventListener('DOMContentLoaded', () => {
-    showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header');
-});
+// Function to set the initial state of the navbar based on localStorage
+const setInitialNavbarState = (navId, bodyId, headerId) => {
+    const nav = document.getElementById(navId),
+        bodypd = document.getElementById(bodyId),
+        headerpd = document.getElementById(headerId);
 
+    const navbarState = localStorage.getItem('navbarState');
+
+    if (navbarState === 'show') {
+        nav.classList.add('show');
+        bodypd.classList.add('body-pd');
+        headerpd.classList.add('body-pd');
+    }
+};
+
+// Call the functions
+showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header');
+setInitialNavbarState('nav-bar', 'body-pd', 'header');
 
 /*===== LINK ACTIVE  =====*/ 
 // Obtener todas las opciones de navegación
@@ -57,7 +68,5 @@ const setActiveLink = () => {
 
 // Llamar a la función cuando la página cargue
 setActiveLink();
-
-
 
 // https://github.com/bedimcode/responsive-sidebar-menu/tree/master

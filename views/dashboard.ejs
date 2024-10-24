@@ -5,22 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link href="/css/dashboad.css" rel="stylesheet" type="text/css">
-
+</head>
+<body>
     <%- include('../views/templates/sidebar.ejs') %>
 
-        <div class="container">
-            <!-- Área central dinámica -->
-            <main class="content">
-                <img class="login__img" src="/img/p2.png" alt="Login image" />
-                <div class="hero-content">
-                    <h1>Rocket MOST</h1>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
-                    <a href="/learn-more" class="cta-button">Learn More</a>
-                </div>
-            </main>
+    <div class="main-container">
+        <!-- Contenedor para la imagen -->
+        <div class="image-container">
+            <img class="login__img" src="/img/p2.png" alt="Login image" />
         </div>
+        <!-- Contenedor para el texto -->
+        <div class="text-container">
+            <div class="hero-content">
+                <h1>Rocket MOST</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
+                <a href="/learn-more" class="cta-button">Learn More</a>
+            </div>
+        </div>
+    </div>
 
     <!-- Incluye Remixicon para íconos -->
-    <script src="/js/dashboard.js"></script>
-</body>
-</html>
+    <script 
