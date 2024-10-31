@@ -10,8 +10,8 @@ app.get('/', (req, res) => {
     res.render('index')
 });
 
-app.get('/dashboard', (req, res) => {
-    res.render('dashboard')
+app.get('/home', (req, res) => {
+    res.render('home')
 });
 
 app.get('/projects', (req, res) => {
