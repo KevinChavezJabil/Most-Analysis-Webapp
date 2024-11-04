@@ -2,7 +2,9 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const Connection=require("./database/db");
 app.set('view engine', 'ejs');
+Connection();
 
 // render views
 app.get('/', (req, res) => {
