@@ -2,10 +2,8 @@ const authMiddleware = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-        return res.redirect('/'); // Redirige al login si no está autenticado
+        return res.redirect('/'); 
     }
-
-    // Aquí podrías agregar lógica para validar el token si estás usando JWT u otro método
     next();
 };
 

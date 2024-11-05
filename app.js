@@ -40,6 +40,10 @@ app.get('/projects', authMiddleware, (req, res) => {
     res.render('projects');
 });
 
+app.get('/excelUpload', authMiddleware, (req, res) => {
+    res.render('excelUpload');
+});
+
 app.get('/settings', authMiddleware, (req, res) => {
     res.render('settings');
 });
