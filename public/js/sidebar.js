@@ -69,4 +69,28 @@ const setActiveLink = () => {
 // Llamar a la función cuando la página cargue
 setActiveLink();
 
+// Obtener el botón de logout por su id
+const logoutButton = document.getElementById("logoutButton");
+
+if (logoutButton) {
+    logoutButton.addEventListener("click", async (e) => {
+        e.preventDefault(); // Evitar el comportamiento predeterminado del enlace
+
+        try {
+            // Realizar una solicitud de logout al servidor
+            const response = await fetch("/api/logout", { method: "GET" });
+
+            if (response.ok) {
+                // Si la solicitud es exitosa, redirigir a la página de inicio
+                window.location.href = "/";
+            } else {
+                console.error("Error logging out");
+            }
+        } catch (error) {
+            console.error("Failed to log out:", error);
+        }
+    });
+}
+
+
 // https://github.com/bedimcode/responsive-sidebar-menu/tree/master
