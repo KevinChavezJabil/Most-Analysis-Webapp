@@ -7,6 +7,7 @@ const port = 3000;
 const Connection = require("./database/db");
 const authRoute = require("./routes/route");
 const authMiddleware = require('./middleware/auth');
+const MechanicalAssembly = require('./database/schema/MechanicalAssembly');
 
 app.set('view engine', 'ejs');
 Connection();
@@ -48,8 +49,17 @@ app.get('/settings', authMiddleware, (req, res) => {
     res.render('settings');
 });
 
-app.get('/MOST', authMiddleware, (req, res) => {
-    res.render('MOST');
+app.get('/MOST_Analysis', authMiddleware, (req, res) => {
+    res.render('MOST_Analysis');
+});
+
+app.get('/api/methods', async (req, res) => {
+    try {
+      const methods = await MechanicalAssembly.find();
+      res.json(methods);
+    } catch (err) {
+      res.status(500).send(err);
+    }
 });
 
 // Rutas de autenticación

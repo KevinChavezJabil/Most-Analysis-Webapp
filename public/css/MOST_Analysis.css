@@ -1,0 +1,135 @@
+/* GOOGLE FONTS */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+/* VARIABLES CSS */
+:root {
+  --first-color: #163e6a;
+  --second-color: #537091;
+  --title-color: hsl(244, 12%, 12%);
+  --text-color: hsl(244, 4%, 36%);
+  --body-color: #ffffff;
+  --body-font: 'Poppins', sans-serif;
+  --h1-font-size: 2.5rem;
+  --p-font-size: 1rem;
+  --table-header-bg: #f4f4f4;
+  --table-border-color: #ddd;
+  --input-border-color: #ccc;
+  --font-medium: 500;
+  --font-semi-bold: 600;
+  --font-bold: 800;
+}
+
+/* BASE */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--body-color);
+  font-family: var(--body-font);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  width: 100%;
+  padding: 20px;
+}
+
+.method-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.add-method-btn, .remove-method-btn {
+  padding: 5px 10px;
+  background-color: var(--first-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--body-font);
+}
+
+.add-method-btn:hover, .remove-method-btn:hover {
+  background-color: #0e2b4e;
+}
+
+h1 {
+  font-size: var(--h1-font-size);
+  font-weight: var(--font-bold);
+  color: var(--first-color);
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+thead {
+  background-color: var(--table-header-bg);
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid var(--table-border-color);
+  text-align: left;
+}
+
+th {
+  font-weight: var(--font-semi-bold);
+}
+
+input[type="text"], input[type="number"], select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  font-family: var(--body-font);
+}
+
+.quantity-input {
+  text-align: right;
+}
+
+tfoot td {
+  font-weight: var(--font-bold);
+}
+
+tfoot td span {
+  font-weight: var(--font-medium);
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  th, td {
+    padding: 6px;
+  }
+}

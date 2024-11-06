@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOST Analysis</title>
+    <link href="/css/MOST_Analysis.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <%- include('../views/templates/sidebar.ejs') %>
+
+    <div class="main-container">
+        <h1>MOST Analysis</h1>
+        <table id="mostTable">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Description</th>
+                    <th>Methods</th>
+                    <th>Quantity</th>
+                    <th>Cycle Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" placeholder="Component Name" /></td>
+                    <td><input type="text" placeholder="Operation" /></td>
+                    <td>
+                        <div class="method-container">
+                            <select class="method-dropdown"></select>
+                            <select class="method-dropdown"></select>
+                            <button type="button" class="add-method-btn">+</button>
+                            <button type="button" class="remove-method-btn">-</button>
+                        </div>
+                    </td>
+                    <td><input type="number" class="quantity-input" value="1" /></td>
+                    <td><span class="cycle-time">0</span></td>
+                </tr>
+                <!-- Puedes agregar más filas dinámicamente según el BOM -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">Total Cycle Time</td>
+                    <td><span id="totalCycleTime">0</span></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script src="/js/MOST_Analysis.js"></script>
+</body>
+</html>
