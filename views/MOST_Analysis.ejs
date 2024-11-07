@@ -14,8 +14,9 @@
         <table id="mostTable">
             <thead>
                 <tr>
-                    <th>Component</th>
+                    <th>Part Number</th>
                     <th>Description</th>
+                    <th>Component</th>
                     <th>Methods</th>
                     <th>Quantity</th>
                     <th>Cycle Time</th>
@@ -23,11 +24,13 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><input type="text" placeholder="Component Name" /></td>
-                    <td><input type="text" placeholder="Operation" /></td>
+                    <td><input type="text" placeholder="Part Number" /></td>
+                    <td><input type="text" placeholder="Description" /></td>
+                    <td>
+                        <select class="component-dropdown"></select>
+                    </td>
                     <td>
                         <div class="method-container">
-                            <select class="method-dropdown"></select>
                             <select class="method-dropdown"></select>
                             <button type="button" class="add-method-btn">+</button>
                             <button type="button" class="remove-method-btn">-</button>
@@ -40,7 +43,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4">Total Cycle Time</td>
+                    <td colspan="5">Total Cycle Time</td>
                     <td><span id="totalCycleTime">0</span></td>
                 </tr>
             </tfoot>
