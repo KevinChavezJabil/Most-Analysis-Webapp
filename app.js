@@ -13,6 +13,7 @@ const Project = require('./database/schema/projectSchema'); // Asegúrate de que
 const MechanicalAssembly = require('./database/schema/MechanicalAssembly');
 const MechanicalComponent = require('./database/schema/MechanicalComponent');
 const moment = require('moment');
+const xlsx = require('xlsx');
 
 app.set('view engine', 'ejs');
 Connection();
@@ -74,24 +75,53 @@ app.get('/api/methods', async (req, res) => {
     }
 });
 
-app.post('/MOST_Analysis', upload.single('excelFile'), async (req, res) => {
+app.get('/MOST_Analysis/:projectUrl', authMiddleware, async (req, res) => {
+    const { projectUrl } = req.params;
+
+    try {
+        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
+        if (!project) {
+            return res.status(404).send("Proyecto no encontrado");
+        }
+
+        // Pasa los datos del proyecto y el Excel a la plantilla EJS
+        res.render('MOST_Analysis', { project, excelData: project.excelData });
+    } catch (error) {
+        console.error('Error al cargar el proyecto:', error);
+        res.status(500).send('Error al cargar el proyecto');
+    }
+});
+
+app.post('/upload-excel', upload.single('excelFile'), authMiddleware, async (req, res) => {
     const file = req.file;
     if (!file) {
         return res.status(400).send('No se ha cargado ningún archivo');
     }
+
+    // Lee el archivo Excel desde el buffer
+    const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
     
+    // Convierte la hoja en un array de objetos
+    const excelData = xlsx.utils.sheet_to_json(worksheet);
+    
+    // Genera un nombre y URL únicos para el proyecto
     const projectName = file.originalname.split('.')[0];
     const creationDate = new Date();
-    const projectUrl = projectName.replace(/ /g, '-').toLowerCase();
-
+    const projectUrl = `${projectName.replace(/ /g, '-').toLowerCase()}-${Date.now()}`;
+    
+    // Guarda el proyecto y los datos del Excel en la base de datos
     const newProject = new Project({
         name: projectName,
         url: projectUrl,
         creationDate,
         owner: req.user._id,
+        excelData // Guarda los datos del Excel directamente en el proyecto
     });
     await newProject.save();
 
+    // Redirige al usuario al URL personalizado de MOST Analysis del proyecto
     res.redirect(`/MOST_Analysis/${projectUrl}`);
 });
 

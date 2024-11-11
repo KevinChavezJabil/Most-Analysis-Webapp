@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOST Analysis</title>
+    <title>MOST Analysis - <%= project.name %></title>
     <link href="/css/MOST_Analysis.css" rel="stylesheet" type="text/css">
 </head>
 <body>
     <%- include('../views/templates/sidebar.ejs') %>
 
     <div class="main-container">
-        <h1>MOST Analysis</h1>
+        <h1>MOST Analysis for Project: <%= project.name %></h1>
         <table id="mostTable">
             <thead>
                 <tr>
@@ -23,24 +23,35 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><input type="text" placeholder="Part Number" /></td>
-                    <td><input type="text" placeholder="Description" /></td>
-                    <td>
-                        <select class="component-dropdown"></select>
-                    </td>
-                    <td>
-                        <div class="method-container">
-                            <select class="method-dropdown"></select>
-                            <button type="button" class="add-method-btn">+</button>
-                            <button type="button" class="remove-method-btn">-</button>
-                        </div>
-                    </td>
-                    <td><input type="number" class="quantity-input" value="1" /></td>
-                    <td><span class="cycle-time">0</span></td>
-                </tr>
-                <!-- Puedes agregar más filas dinámicamente según el BOM -->
-            </tbody>
+                <% if (excelData && excelData.length > 0) { %>
+                    <% excelData.forEach(row => { %>
+                        <tr>
+                            <td><input type="text" value="<%= row['Part Number'] || '' %>" /></td>
+                            <td><input type="text" value="<%= row.Description || '' %>" /></td>
+                            <td>
+                                <select class="component-dropdown">
+                                    <!-- Opciones de componente -->
+                                </select>
+                            </td>
+                            <td>
+                                <div class="method-container">
+                                    <select class="method-dropdown">
+                                        <!-- Opciones de método -->
+                                    </select>
+                                    <button type="button" class="add-method-btn">+</button>
+                                    <button type="button" class="remove-method-btn">-</button>
+                                </div>
+                            </td>
+                            <td><input type="number" class="quantity-input" value="<%= row.Quantity || 1 %>" /></td>
+                            <td><span class="cycle-time"><%= row['Cycle Time'] || 0 %></span></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="6">No hay datos disponibles</td>
+                    </tr>
+                <% } %>
+            </tbody>            
             <tfoot>
                 <tr>
                     <td colspan="5">Total Cycle Time</td>
