@@ -39,8 +39,6 @@ app.get('/home', authMiddleware, (req, res) => {
     res.render('home');
 });
 
-const mongoose = require('mongoose');
-
 app.get('/projects', authMiddleware, async (req, res) => {
     try {
         const userId = req.user._id; // Asegúrate de que req.user contiene el usuario autenticado
@@ -92,6 +90,22 @@ app.get('/MOST_Analysis/:projectUrl', authMiddleware, async (req, res) => {
     }
 });
 
+app.get('/select-sheets/:projectUrl', authMiddleware, async (req, res) => {
+    const { projectUrl } = req.params;
+    
+    try {
+        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
+        if (!project) {
+            return res.status(404).send("Proyecto no encontrado");
+        }
+
+        res.render('selectSheets', { projectUrl, sheetNames: project.sheetNames });
+    } catch (error) {
+        console.error('Error al cargar el proyecto:', error);
+        res.status(500).send('Error al cargar el proyecto');
+    }
+});
+
 app.post('/upload-excel', upload.single('excelFile'), authMiddleware, async (req, res) => {
     const file = req.file;
     if (!file) {
@@ -100,29 +114,112 @@ app.post('/upload-excel', upload.single('excelFile'), authMiddleware, async (req
 
     // Lee el archivo Excel desde el buffer
     const workbook = xlsx.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    
-    // Convierte la hoja en un array de objetos
-    const excelData = xlsx.utils.sheet_to_json(worksheet);
-    
+    const sheetNames = workbook.SheetNames; // Obtener los nombres de las hojas
+
     // Genera un nombre y URL únicos para el proyecto
     const projectName = file.originalname.split('.')[0];
     const creationDate = new Date();
     const projectUrl = `${projectName.replace(/ /g, '-').toLowerCase()}-${Date.now()}`;
-    
-    // Guarda el proyecto y los datos del Excel en la base de datos
+
+    // Guarda el proyecto con los nombres de las hojas en la base de datos
     const newProject = new Project({
         name: projectName,
         url: projectUrl,
         creationDate,
         owner: req.user._id,
-        excelData // Guarda los datos del Excel directamente en el proyecto
+        sheetNames  // Almacena solo los nombres de las hojas por ahora
     });
     await newProject.save();
 
-    // Redirige al usuario al URL personalizado de MOST Analysis del proyecto
-    res.redirect(`/MOST_Analysis/${projectUrl}`);
+    // Redirige al usuario a la página para seleccionar las hojas
+    res.redirect(`/select-sheets/${projectUrl}`);
+});
+
+app.post('/process-sheets', authMiddleware, async (req, res) => {
+    const { projectUrl, selectedSheets } = req.body;
+
+    if (!selectedSheets || selectedSheets.length === 0) {
+        return res.status(400).send('No sheets selected');
+    }
+
+    try {
+        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
+        if (!project) {
+            return res.status(404).send("Project not found");
+        }
+
+        // Aquí puedes procesar las hojas seleccionadas si es necesario
+
+        // Redirige a la página de análisis MOST
+        res.redirect(`/MOST_Analysis/${projectUrl}`);
+    } catch (error) {
+        console.error('Error processing sheets:', error);
+        res.status(500).send('Error processing sheets');
+    }
+});
+
+app.post('/process-selected-sheets', authMiddleware, async (req, res) => {
+    const { projectId, selectedSheets } = req.body;
+
+    try {
+        // Encuentra el proyecto y verifica si ya tiene las hojas cargadas
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(404).send('Proyecto no encontrado');
+        }
+
+        let workbook;
+        if (req.file && req.file.buffer) {
+            // Si el archivo fue cargado en la solicitud, úsalo
+            workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+        } else if (project.excelData) {
+            // Si el archivo ya está en la base de datos, úsalo
+            workbook = xlsx.read(project.excelData, { type: 'base64' });
+        } else {
+            return res.status(400).send('No se ha proporcionado un archivo para procesar');
+        }
+
+        // Procesa las hojas seleccionadas
+        const processedData = {};
+        selectedSheets.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            processedData[sheetName] = xlsx.utils.sheet_to_json(worksheet);
+        });
+
+        // Puedes hacer algo con `processedData`, como guardarlo en la base de datos o enviarlo a la vista
+        res.json({ success: true, data: processedData });
+
+    } catch (error) {
+        console.error('Error al procesar las hojas seleccionadas:', error);
+        res.status(500).send('Error al procesar las hojas seleccionadas');
+    }
+});
+
+// Ruta para actualizar el nombre del proyecto
+app.put('/projects/:id', authMiddleware, (req, res) => {
+    const projectId = req.params.id;
+    const newName = req.body.name;
+    // Lógica para actualizar el nombre del proyecto en la base de datos
+    Project.findByIdAndUpdate(projectId, { name: newName }, (err, result) => {
+        if (err) {
+            res.json({ success: false, message: 'Error updating project name.' });
+        } else {
+            res.json({ success: true, message: 'Project name updated successfully!' });
+        }
+    });
+});
+
+// Ruta para eliminar el proyecto
+app.delete('/projects/:id', authMiddleware, (req, res) => {
+    const projectId = req.params.id;
+    // Lógica para eliminar el proyecto de la base de datos
+    Project.findByIdAndDelete(projectId, (err) => {
+        if (err) {
+            res.json({ success: false, message: 'Error deleting project.' });
+        } else {
+            res.json({ success: true, message: 'Project deleted successfully!' });
+        }
+    });
 });
 
 app.use("/api", authRoute);
