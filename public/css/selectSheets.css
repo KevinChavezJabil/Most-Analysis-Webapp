@@ -1,0 +1,108 @@
+/* GOOGLE FONTS */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* VARIABLES CSS */
+:root {
+  --first-color: #163e6a;
+  --second-color: #537091;
+  --text-white: #ffffff;
+  --text-black: #000000;
+  --body-font: 'Poppins', sans-serif;
+  --h1-font-size: 1.5rem;
+  --h2-font-size: 1.2rem;
+  --h3-font-size: 1rem;
+  --h4-font-size: 0.85rem;
+  --small-font-size: 0.75rem;
+  --background-color: #e0e0e0; /* Fondo grisáceo */
+  --container-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más marcada */
+  --warning-color: #ff4d4d; /* Color de advertencia */
+}
+
+/* BASE */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: var(--body-font);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+}
+
+.main-container {
+  background-color: var(--text-white);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: var(--container-shadow);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+h1 {
+  font-size: var(--h1-font-size);
+  font-weight: 600;
+  color: var(--first-color);
+  margin-bottom: 20px;
+}
+
+.sheet-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sheet-option input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.sheet-option label {
+  font-size: var(--h3-font-size);
+  color: var(--text-black);
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--first-color);
+  color: var(--text-white);
+  font-size: var(--h3-font-size);
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.cta-button:hover {
+  background-color: #0e2b4e;
+}
+
+.warning-message {
+  display: none;
+  color: var(--warning-color);
+  font-size: var(--h4-font-size);
+  margin-top: 10px;
+}
+
+/* MEDIA QUERIES */
+@media screen and (max-width: 768px) {
+  .main-container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: var(--h2-font-size);
+  }
+
+  .cta-button {
+    font-size: var(--h4-font-size);
+    padding: 8px 15px;
+  }
+}

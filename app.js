@@ -5,13 +5,11 @@ const app = express();
 const port = 3000;
 const Connection = require("./database/db");
 const authRoute = require("./routes/route");
+const projectRoutes = require('./routes/projectRoutes'); // Nueva ruta de proyectos
 const authMiddleware = require('./middleware/auth');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const Project = require('./database/schema/projectSchema'); // Asegúrate de que la ruta sea correcta
-const MechanicalAssembly = require('./database/schema/MechanicalAssembly');
-const MechanicalComponent = require('./database/schema/MechanicalComponent');
 const moment = require('moment');
 const xlsx = require('xlsx');
 
@@ -39,20 +37,6 @@ app.get('/home', authMiddleware, (req, res) => {
     res.render('home');
 });
 
-const mongoose = require('mongoose');
-
-app.get('/projects', authMiddleware, async (req, res) => {
-    try {
-        const userId = req.user._id; // Asegúrate de que req.user contiene el usuario autenticado
-        const projects = await Project.find({ owner: userId });
-        const projectNames = projects.map(project => project.name); // Obtener los nombres de los proyectos
-        res.render('projects', { projects, suggestions: projectNames });
-    } catch (error) {
-        console.error('Error fetching projects:', error);
-        res.render('projects', { projects: [], suggestions: [] }); // Renderiza una lista vacía en caso de error
-    }
-});
-
 app.get('/excelUpload', authMiddleware, (req, res) => {
     res.render('excelUpload');
 });
@@ -75,57 +59,8 @@ app.get('/api/methods', async (req, res) => {
     }
 });
 
-app.get('/MOST_Analysis/:projectUrl', authMiddleware, async (req, res) => {
-    const { projectUrl } = req.params;
-
-    try {
-        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
-        if (!project) {
-            return res.status(404).send("Proyecto no encontrado");
-        }
-
-        // Pasa los datos del proyecto y el Excel a la plantilla EJS
-        res.render('MOST_Analysis', { project, excelData: project.excelData });
-    } catch (error) {
-        console.error('Error al cargar el proyecto:', error);
-        res.status(500).send('Error al cargar el proyecto');
-    }
-});
-
-app.post('/upload-excel', upload.single('excelFile'), authMiddleware, async (req, res) => {
-    const file = req.file;
-    if (!file) {
-        return res.status(400).send('No se ha cargado ningún archivo');
-    }
-
-    // Lee el archivo Excel desde el buffer
-    const workbook = xlsx.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    
-    // Convierte la hoja en un array de objetos
-    const excelData = xlsx.utils.sheet_to_json(worksheet);
-    
-    // Genera un nombre y URL únicos para el proyecto
-    const projectName = file.originalname.split('.')[0];
-    const creationDate = new Date();
-    const projectUrl = `${projectName.replace(/ /g, '-').toLowerCase()}-${Date.now()}`;
-    
-    // Guarda el proyecto y los datos del Excel en la base de datos
-    const newProject = new Project({
-        name: projectName,
-        url: projectUrl,
-        creationDate,
-        owner: req.user._id,
-        excelData // Guarda los datos del Excel directamente en el proyecto
-    });
-    await newProject.save();
-
-    // Redirige al usuario al URL personalizado de MOST Analysis del proyecto
-    res.redirect(`/MOST_Analysis/${projectUrl}`);
-});
-
 app.use("/api", authRoute);
+app.use('/', projectRoutes); // Asegúrate de que esta línea esté presente
 
 app.use(authMiddleware, (req, res, next) => {
     res.status(404).render('404');

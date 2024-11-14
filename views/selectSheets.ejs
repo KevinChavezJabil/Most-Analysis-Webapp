@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Sheets</title>
+    <link href="/css/selectSheets.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <%- include('../views/templates/sidebar.ejs') %>
+
+    <div class="main-container">
+        <h1>Select Sheets for MOST Analysis</h1>
+        <form id="sheetSelectionForm" action="/process-sheets" method="post">
+            <% sheetNames.forEach(sheetName => { %>
+                <div class="sheet-option">
+                    <input type="checkbox" name="selectedSheets" value="<%= sheetName %>" id="<%= sheetName %>">
+                    <label for="<%= sheetName %>"><%= sheetName %></label>
+                </div>
+            <% }) %>
+            <div class="sheet-option">
+                <input type="checkbox" id="selectAll">
+                <label for="selectAll">Select All</label>
+            </div>
+            <input type="hidden" name="projectUrl" value="<%= projectUrl %>">
+            <div id="warningMessage" class="warning-message">Please select at least one sheet to proceed.</div>
+            <button type="submit" class="cta-button">Proceed with Selected Sheets</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const selectAllCheckbox = document.getElementById("selectAll");
+            const checkboxes = document.querySelectorAll('input[name="selectedSheets"]');
+            const form = document.getElementById("sheetSelectionForm");
+            const warningMessage = document.getElementById("warningMessage");
+
+            selectAllCheckbox.addEventListener("change", () => {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            form.addEventListener("submit", (event) => {
+                const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                if (!anyChecked) {
+                    event.preventDefault();
+                    warningMessage.style.display = "block";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
