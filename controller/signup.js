@@ -4,31 +4,26 @@ const bcrypt = require("bcryptjs");
 
 const createUser = async (req, res) => {
   try {
-    if (
-      !(
-        req.body.email &&
-        req.body.password &&
-        req.body.name &&
-        req.body.username
-      )
-    ) {
+    const { first_name, last_name, email, password } = req.body;
+    if (!(first_name && last_name && email && password)) {
       return res.status(400).send("All input is required");
     }
 
-    const oldUser = await User.findOne({ email: req.body.email });
-
+    const oldUser = await User.findOne({ email });
     if (oldUser) {
       return res.status(409).send("User Already Exist. Please Login");
     }
 
     const salt = 10;
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = new User({
-      name: req.body.name,
-      username: req.body.username,
-      email: req.body.email,
+      first_name,
+      last_name,
+      email,
       password: hashedPassword,
     });
+
     const user = await newUser.save();
     const token = createSecretToken(user._id);
 
@@ -41,13 +36,11 @@ const createUser = async (req, res) => {
     });
 
     console.log("cookie set successfully");
-
-    res.json(user);
+    res.json({ redirectUrl: '/home' });
   } catch (error) {
     console.log("Got an error", error);
     res.status(500).send("Error creating user");
   }
 };
 
-// Exporta la función correctamente
 module.exports = createUser;
