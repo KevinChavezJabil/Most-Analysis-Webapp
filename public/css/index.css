@@ -43,7 +43,7 @@
 body {
   background-color: var(--body-color);
   font-family: var(--body-font);
-  color: var(--text-color);
+  color: var (--text-color);
 }
 
 input,
@@ -309,4 +309,23 @@ img {
   .login__button-ghost {
     border: 2.5px solid var(--first-color);
   }
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.error-message {
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.error-message-item {
+  color: red;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
 }

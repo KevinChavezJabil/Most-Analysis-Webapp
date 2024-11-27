@@ -62,6 +62,9 @@ app.get('/api/methods', async (req, res) => {
 app.use("/api", authRoute);
 app.use('/', projectRoutes); // Asegúrate de que esta línea esté presente
 
+const checkEmailRoute = require('./routes/checkEmail');
+app.use('/api', checkEmailRoute);
+
 app.use(authMiddleware, (req, res, next) => {
     res.status(404).render('404');
 });

@@ -56,20 +56,25 @@
               <div>
                 <label for="firstName" class="login__label">First Name</label>
                 <input class="login__input" type="text" id="firstName" placeholder="Enter your first name" required />
+                <span class="error-message"></span> <!-- Inline error message -->
               </div>
               <div>
                 <label for="lastName" class="login__label">Last Name</label>
                 <input class="login__input" type="text" id="lastName" placeholder="Enter your last name" required />
+                <span class="error-message"></span> <!-- Inline error message -->
               </div>
               <div>
                 <label for="signUpEmail" class="login__label">Email</label>
                 <input class="login__input" type="email" id="signUpEmail" placeholder="Enter your email address" required />
+                <span class="error-message"></span> <!-- Inline error message -->
               </div>
               <div>
                 <label for="signUpPassword" class="login__label">Password</label>
                 <div class="login__box">
-                  <input class="login__input" type="password" id="signUpPassword" placeholder="Create a password" required />
                   <i class="ri-eye-off-line login__eye" id="signUpIcon"></i>
+                  <input class="login__input" type="password" id="signUpPassword" placeholder="Create a password" required />
+                  <div class="error-message"></div> <!-- Inline error message container -->
+                  
                 </div>
               </div>
             </div>
