@@ -10,7 +10,7 @@ const login = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!(user && (await bcrypt.compare(password, user.password)))) {
-    return res.status(404).json({ message: "Invalid credentials" });
+    return res.status(400).json({ message: 'Incorrect password.' });
   }
 
   const token = createSecretToken(user._id);

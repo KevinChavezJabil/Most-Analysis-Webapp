@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastNameInput = signUpForm.querySelector('#lastName');
   const emailInput = signUpForm.querySelector('#signUpEmail');
   const passwordInput = signUpForm.querySelector('#signUpPassword');
+  const loginEmailInput = loginForm.querySelector('#email');
+  const loginPasswordInput = loginForm.querySelector('#password');
 
   toggleSignUp.addEventListener('click', () => {
     loginForm.style.display = 'none';
@@ -171,6 +173,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const isPasswordValid = validatePassword(passwordInput);
 
     if (!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPasswordValid) {
+      e.preventDefault(); // Prevent form submission
+    }
+  });
+
+  // Validate Login Email
+  const validateLoginEmail = async (input) => {
+    const errorElement = input.nextElementSibling;
+    const value = input.value.trim();
+    errorElement.textContent = ''; // Clear previous errors
+
+    if (!value) {
+      errorElement.textContent = 'Email is required.';
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      errorElement.textContent = 'Enter a valid email address.';
+      return false;
+    }
+
+    // Check if email exists on the server
+    const response = await fetch('/api/check-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: value }),
+    });
+
+    const data = await response.json();
+    if (response.ok && !data.exists) {
+      errorElement.textContent = 'No account found with this email.';
+      return false;
+    }
+
+    return true;
+  };
+
+  // Validate Login Password
+  const validateLoginPassword = async (emailInput, passwordInput) => {
+    const errorElement = passwordInput.nextElementSibling;
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    errorElement.textContent = ''; // Clear previous errors
+
+    if (!password) {
+      errorElement.textContent = 'Password is required.';
+      return false;
+    }
+
+    // Check credentials with the server
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      errorElement.textContent = data.message || 'Incorrect password.';
+      return false;
+    }
+
+    return true;
+  };
+
+  // Attach event listener for form submission
+  loginBtn.addEventListener('click', async (e) => {
+    const isEmailValid = await validateLoginEmail(loginEmailInput);
+    const isPasswordValid = await validateLoginPassword(loginEmailInput, loginPasswordInput);
+
+    if (!isEmailValid || !isPasswordValid) {
       e.preventDefault(); // Prevent form submission
     }
   });

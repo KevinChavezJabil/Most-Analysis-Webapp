@@ -28,13 +28,16 @@
               <div>
                 <label for="email" class="login__label">Email</label>
                 <input class="login__input" type="email" id="email" placeholder="Enter your email address" required />
+                <span class="error-message"></span> <!-- Inline error message -->
               </div>
               <div>
                 <label for="password" class="login__label">Password</label>
                 <div class="login__box">
-                  <input class="login__input" type="password" id="password" placeholder="Enter your password" required />
                   <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                  <input class="login__input" type="password" id="password" placeholder="Enter your password" required />
+                  <span class="error-message"></span> <!-- Inline error message -->
                 </div>
+                
               </div>
             </div>
 
@@ -71,10 +74,9 @@
               <div>
                 <label for="signUpPassword" class="login__label">Password</label>
                 <div class="login__box">
-                  <i class="ri-eye-off-line login__eye" id="signUpIcon"></i>
                   <input class="login__input" type="password" id="signUpPassword" placeholder="Create a password" required />
+                  <i class="ri-eye-off-line login__eye" id="signUpIcon"></i>
                   <div class="error-message"></div> <!-- Inline error message container -->
-                  
                 </div>
               </div>
             </div>

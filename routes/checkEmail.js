@@ -6,8 +6,8 @@ router.post('/check-email', async (req, res) => {
   const { email } = req.body;
 
   try {
-    const userExists = await User.findOne({ email });
-    res.json({ exists: !!userExists });
+    const user = await User.findOne({ email });
+    res.json({ exists: !!user });
   } catch (error) {
     console.error('Error checking email:', error);
     res.status(500).json({ error: 'Internal server error' });
