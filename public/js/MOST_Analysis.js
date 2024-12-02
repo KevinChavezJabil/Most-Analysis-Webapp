@@ -1,140 +1,135 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    const methodDropdowns = document.querySelectorAll(".method-dropdown");
-    const componentDropdowns = document.querySelectorAll(".component-dropdown");
-    const addMethodBtns = document.querySelectorAll(".add-method-btn");
-    const removeMethodBtns = document.querySelectorAll(".remove-method-btn");
+document.addEventListener('DOMContentLoaded', () => {
+    const tableBody = document.getElementById('mostTable').getElementsByTagName('tbody')[0];
+    const addRowBtn = document.getElementById('addRowBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const addSheetBtn = document.getElementById('addSheetBtn');
+    const notification = document.getElementById('notification');
+    let isModified = false;
 
-    let methods = [];
-    let components = [];
+    // Agregar fila nueva
+    addRowBtn.addEventListener('click', () => {
+        const newRow = document.createElement('tr');
 
-    try {
-        const response = await fetch('/api/methods');
-        const data = await response.json();
-        methods = data.methods;
-        components = data.components;
+        for (let i = 0; i < 7; i++) {
+            const newCell = document.createElement('td');
+            newCell.contentEditable = "true";
+            newCell.textContent = "";
+            newRow.appendChild(newCell);
+        }
 
-        // Llenar los dropdowns de métodos
-        methodDropdowns.forEach(dropdown => {
-            methods.forEach(method => {
-                const option = document.createElement("option");
-                option.value = method.method;
-                option.textContent = method.method;
-                dropdown.appendChild(option);
+        tableBody.appendChild(newRow);
+        updateRowNumbers();
+        isModified = true;
+    });
+
+    // Actualizar números de fila
+    function updateRowNumbers() {
+        const rows = tableBody.getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].cells[0].textContent = i + 1;
+        }
+    }
+
+    // Guardar datos al cambiar
+    tableBody.addEventListener('input', () => {
+        isModified = true;
+    });
+
+    // Función para mostrar la notificación
+    function showNotification(message) {
+        notification.textContent = message;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 2000);
+    }
+
+    // Función para guardar cambios
+    async function saveChanges() {
+        const projectId = window.location.pathname.split('/').pop();
+        const sheetName = document.querySelector('.sheet-tab.active').textContent;
+        const rows = tableBody.getElementsByTagName('tr');
+        const rowDataArray = [];
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const rowData = {
+                'Part Number': row.cells[1].textContent,
+                'Description': row.cells[2].textContent,
+                'Component': row.cells[3].textContent,
+                'Methods': row.cells[4].textContent,
+                'Quantity': row.cells[5].textContent,
+                'Cycle Time': row.cells[6].textContent
+            };
+            rowDataArray.push(rowData);
+        }
+
+        try {
+            const response = await fetch(`/save-changes/${projectId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sheetName, rowDataArray })
             });
-        });
 
-        // Llenar los dropdowns de componentes
-        componentDropdowns.forEach(dropdown => {
-            components.forEach(component => {
-                const option = document.createElement("option");
-                option.value = component.component;
-                option.textContent = component.component;
-                dropdown.appendChild(option);
+            const result = await response.json();
+            if (result.success) {
+                showNotification("Changes saved successfully!");
+                isModified = false;
+            } else {
+                alert("Error al guardar cambios");
+            }
+        } catch (error) {
+            console.error('Error al guardar cambios:', error);
+        }
+    }
+
+    // Evento para el botón de guardar
+    saveBtn.addEventListener('click', saveChanges);
+
+    // Evento para Ctrl + S
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            saveChanges();
+        }
+    });
+
+    // Advertencia al cerrar o cambiar de proyecto
+    window.addEventListener('beforeunload', (e) => {
+        if (isModified) {
+            const confirmationMessage = "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir sin guardar?";
+            e.returnValue = confirmationMessage; // Estándar para la mayoría de los navegadores
+            return confirmationMessage; // Para algunos navegadores
+        }
+    });
+
+    // Agregar nueva hoja
+    addSheetBtn.addEventListener('click', async () => {
+        const newSheetName = prompt("Enter new sheet name:");
+        if (newSheetName) {
+            const projectUrl = window.location.pathname.split('/').pop();
+            const response = await fetch('/add-sheet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ projectUrl, newSheetName })
             });
-        });
-    } catch (err) {
-        console.error('Error fetching methods and components:', err);
-    }
 
-    // Función para actualizar el ciclo con método y componente seleccionados
-    function updateCycleTime(row) {
-        const dropdowns = row.querySelectorAll(".method-dropdown");
-        const componentDropdown = row.querySelector(".component-dropdown");
-        const quantity = parseFloat(row.querySelector(".quantity-input").value) || 0;
-        const cycleTimeElement = row.querySelector(".cycle-time");
-
-        let totalStandardTime = 0;
-
-        // Sumar tiempos de métodos seleccionados
-        dropdowns.forEach(dropdown => {
-            const method = dropdown.value;
-            const selectedMethod = methods.find(m => m.method === method);
-            const standardTime = selectedMethod ? selectedMethod.standard_time : 0;
-            totalStandardTime += standardTime;
-        });
-
-        // Sumar tiempo del componente seleccionado
-        const selectedComponent = components.find(c => c.component === componentDropdown.value);
-        const componentTime = selectedComponent ? selectedComponent.standard_time : 0;
-        totalStandardTime += componentTime;
-
-        const cycleTime = totalStandardTime * quantity;
-        cycleTimeElement.textContent = cycleTime.toFixed(2);
-        updateTotalCycleTime();
-    }
-
-    function updateTotalCycleTime() {
-        const cycleTimeElements = document.querySelectorAll(".cycle-time");
-        let totalCycleTime = 0;
-
-        cycleTimeElements.forEach(element => {
-            totalCycleTime += parseFloat(element.textContent) || 0;
-        });
-
-        document.getElementById("totalCycleTime").textContent = totalCycleTime.toFixed(2);
-    }
-
-    // Eventos para actualizar el ciclo al cambiar el método o la cantidad
-    document.querySelectorAll(".method-dropdown").forEach(dropdown => {
-        dropdown.addEventListener("change", (e) => {
-            const row = e.target.closest("tr");
-            updateCycleTime(row);
-        });
-    });
-
-    document.querySelectorAll(".component-dropdown").forEach(dropdown => {
-        dropdown.addEventListener("change", (e) => {
-            const row = e.target.closest("tr");
-            updateCycleTime(row);
-        });
-    });
-
-    document.querySelectorAll(".quantity-input").forEach(input => {
-        input.addEventListener("input", (e) => {
-            const row = e.target.closest("tr");
-            updateCycleTime(row);
-        });
-    });
-
-    // Añadir eventos para agregar más dropdowns
-    addMethodBtns.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            const methodContainer = e.target.closest(".method-container");
-            const dropdowns = methodContainer.querySelectorAll(".method-dropdown");
-
-            if (dropdowns.length < 7) {
-                const newDropdown = document.createElement("select");
-                newDropdown.classList.add("method-dropdown");
-
-                methods.forEach(method => {
-                    const option = document.createElement("option");
-                    option.value = method.method;
-                    option.textContent = method.method;
-                    newDropdown.appendChild(option);
-                });
-
-                methodContainer.insertBefore(newDropdown, btn);
-
-                // Añadir evento al nuevo dropdown
-                newDropdown.addEventListener("change", (e) => {
-                    const row = e.target.closest("tr");
-                    updateCycleTime(row);
-                });
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert("Error adding sheet");
             }
-        });
+        }
     });
 
-    // Añadir eventos para eliminar dropdowns
-    removeMethodBtns.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            const methodContainer = e.target.closest(".method-container");
-            const dropdowns = methodContainer.querySelectorAll(".method-dropdown");
-
-            if (dropdowns.length > 1) {
-                methodContainer.removeChild(dropdowns[dropdowns.length - 1]);
-                const row = e.target.closest("tr");
-                updateCycleTime(row);
-            }
-        });
-    });
+    // Cambiar entre hojas
+    window.switchSheet = (sheetIndex) => {
+        const projectUrl = window.location.pathname.split('/').pop();
+        window.location.href = `/MOST_Analysis/${projectUrl}?sheetIndex=${sheetIndex}`;
+    };
 });

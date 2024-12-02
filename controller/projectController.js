@@ -38,6 +38,27 @@ exports.deleteProject = (req, res) => {
     });
 };
 
+exports.createBlankProject = async (req, res) => {
+    try {
+        const projectName = `Blank Project ${Date.now()}`;
+        const projectUrl = `blank-project-${Date.now()}`;
+        const creationDate = new Date();
+        const newProject = new Project({
+            name: projectName,
+            url: projectUrl,
+            creationDate,
+            owner: req.user._id,
+            excelData: { 'Hoja1': [] }, // Proyecto en blanco con una hoja vacía
+            sheets: [{ name: 'Hoja1', data: [] }] // Asegurarse de que haya al menos una hoja
+        });
+        await newProject.save();
+        res.redirect(`/MOST_Analysis/${projectUrl}`);
+    } catch (error) {
+        console.error('Error creating blank project:', error);
+        res.status(500).send('Error creating blank project');
+    }
+};
+
 exports.uploadExcel = async (req, res) => {
     const file = req.file;
     if (!file) {
@@ -107,6 +128,7 @@ exports.processSheets = async (req, res) => {
 
 exports.mostAnalysis = async (req, res) => {
     const { projectUrl } = req.params;
+    const sheetIndex = parseInt(req.query.sheetIndex) || 0;
 
     try {
         const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
@@ -114,20 +136,48 @@ exports.mostAnalysis = async (req, res) => {
             return res.status(404).send("Proyecto no encontrado");
         }
 
-        const excelData = project.excelData;
+        // Asegurarse de que project.sheets esté definido y tenga al menos una hoja
+        if (!project.sheets || project.sheets.length === 0) {
+            project.sheets = [{ name: 'Hoja1', data: [] }];
+            await project.save();
+        }
 
-        console.log('Datos enviados a la vista:', excelData); // Para depurar
+        // Asegurarse de que el índice de la hoja esté dentro del rango válido
+        const validSheetIndex = Math.min(Math.max(sheetIndex, 0), project.sheets.length - 1);
+        const currentSheet = project.sheets[validSheetIndex];
 
-        res.render('MOST_Analysis', { project, excelData });
+        res.render('MOST_Analysis', { project, currentSheet });
     } catch (error) {
-        console.error('Error al cargar el proyecto:', error);
-        res.status(500).send('Error al cargar el proyecto');
+        console.error('Error en MOST Analysis:', error);
+        res.status(500).send('Hubo un error al cargar la página de análisis.');
+    }
+};
+
+exports.addSheet = async (req, res) => {
+    const { projectUrl, newSheetName } = req.body;
+
+    try {
+        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
+        if (!project) {
+            return res.status(404).send("Proyecto no encontrado");
+        }
+
+        if (!project.excelData[newSheetName]) {
+            project.excelData[newSheetName] = [];
+            project.sheets.push({ name: newSheetName, data: [] });
+            await project.save();
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al agregar hoja:', error);
+        res.json({ success: false });
     }
 };
 
 exports.saveChanges = async (req, res) => {
     const { projectId } = req.params;
-    const { rowData } = req.body;
+    const { sheetName, rowDataArray } = req.body;
 
     try {
         const project = await Project.findById(projectId);
@@ -135,20 +185,14 @@ exports.saveChanges = async (req, res) => {
             return res.status(404).send("Proyecto no encontrado");
         }
 
-        // Actualizar datos en excelData (busca la fila correspondiente y actualiza)
-        const sheetName = "Hoja1"; // Ajusta según sea necesario
-        const rowIndex = project.excelData[sheetName].findIndex(row => row["Part Number"] === rowData.partNumber);
-
-        if (rowIndex !== -1) {
-            project.excelData[sheetName][rowIndex] = rowData;
-        }
+        // Actualizar datos en excelData
+        project.excelData[sheetName] = rowDataArray;
 
         await project.save();
-        res.status(200).send("Cambios guardados exitosamente");
+        res.json({ success: true });
     } catch (error) {
         console.error('Error al guardar cambios:', error);
         res.status(500).send('Error al guardar cambios');
     }
 };
-
 

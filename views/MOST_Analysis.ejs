@@ -1,67 +1,101 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOST Analysis - <%= project.name %></title>
-    <link href="/css/MOST_Analysis.css" rel="stylesheet" type="text/css">
+    <title>MOST Analysis - <%= project ? project.name : 'Untitled Project' %></title>
+    <link rel="stylesheet" href="/css/MOST_Analysis.css">
+    <style>
+        /* Estilos para la notificación */
+        #notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
+    <!-- Sidebar o menú de navegación -->
     <%- include('../views/templates/sidebar.ejs') %>
 
     <div class="main-container">
-        <h1>MOST Analysis for Project: <%= project.name %></h1>
-        <table id="mostTable">
-            <thead>
-                <tr>
-                    <th>#</th> <!-- Columna de numeración -->
-                    <th>Part Number</th>
-                    <th>Description</th>
-                    <th>Component</th>
-                    <th>Methods</th>
-                    <th>Quantity</th>
-                    <th>Cycle Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if (excelData && excelData['Hoja1'] && excelData['Hoja1'].length > 0) { %>
-                    <% excelData['Hoja1'].forEach((row, index) => { %>
-                        <tr>
-                            <td><%= index + 1 %></td> <!-- Muestra el número de fila -->
-                            <td><%= row['PART NUMBERS'] %></td>
-                            <td><%= row['DESCRIPTION'] %></td>
-                            <td>
-                                <select class="component-dropdown">
-                                    <!-- Opciones de componente -->
-                                </select>
-                            </td>
-                            <td>
-                                <div class="method-container">
-                                    <select class="method-dropdown">
-                                        <!-- Opciones de método -->
-                                    </select>
-                                    <button type="button" class="add-method-btn">+</button>
-                                    <button type="button" class="remove-method-btn">-</button>
-                                </div>
-                            </td>
-                            <td><%= row['QUANTITY'] %></td>
-                            <td><span class="cycle-time"><%= row['Cycle Time'] || 0 %></span></td>
-                        </tr>
-                    <% }) %>
-                <% } else { %>
+        <h1>MOST Analysis for Project: <%= project ? project.name : 'Untitled Project' %></h1>
+
+        <!-- Contenedor de las hojas -->
+        <div id="sheetContainer">
+            <!-- Tabla editable -->
+            <table id="mostTable">
+                <thead>
                     <tr>
-                        <td colspan="7">No data available</td>
+                        <th>#</th>
+                        <th>Part Number</th>
+                        <th>Description</th>
+                        <th>Component</th>
+                        <th>Methods</th>
+                        <th>Quantity</th>
+                        <th>Cycle Time</th>
                     </tr>
-                <% } %>
-            </tbody>               
-            <tfoot>
-                <tr>
-                    <td colspan="6">Total Cycle Time</td>
-                    <td><span id="totalCycleTime">0</span></td>
-                </tr>
-            </tfoot>
-        </table>
+                </thead>
+                <tbody>
+                    <% if (currentSheet && currentSheet.data && currentSheet.data.length > 0) { %>
+                        <% currentSheet.data.forEach((row, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td contenteditable="true"><%= row['Part Number'] || '' %></td>
+                                <td contenteditable="true"><%= row['Description'] || '' %></td>
+                                <td contenteditable="true"><%= row['Component'] || '' %></td>
+                                <td contenteditable="true"><%= row['Methods'] || '' %></td>
+                                <td contenteditable="true"><%= row['Quantity'] || '' %></td>
+                                <td><span class="cycle-time"><%= row['Cycle Time'] || 0 %></span></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <!-- Filas vacías para entrada manual -->
+                        <tr>
+                            <td>1</td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td><span class="cycle-time">0</span></td>
+                        </tr>
+                    <% } %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6">Total Cycle Time</td>
+                        <td><span id="totalCycleTime">0</span></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <button id="addRowBtn">Add Row</button>
+            <button id="saveBtn">Save</button> <!-- Botón de Guardar -->
+        </div>
+
+        <!-- Barra inferior para hojas -->
+        <div id="sheetBar">
+            <% if (project && project.sheets && project.sheets.length > 0) { %>
+                <% project.sheets.forEach((sheet, index) => { %>
+                    <button 
+                        class="sheet-tab <%= sheet.name === currentSheet.name ? 'active' : '' %>" 
+                        onclick="switchSheet('<%= index %>')">
+                        <%= sheet.name %>
+                    </button>
+                <% }); %>
+            <% } %>
+            <button id="addSheetBtn">+</button>
+        </div>
     </div>
+
+    <!-- Contenedor de notificación -->
+    <div id="notification">Changes saved successfully!</div>
 
     <script src="/js/MOST_Analysis.js"></script>
 </body>
