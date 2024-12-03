@@ -19,14 +19,14 @@ router.get('/select-sheets/:projectUrl', authMiddleware, projectController.selec
 // Ruta para procesar hojas seleccionadas
 router.post('/process-sheets', authMiddleware, projectController.processSheets);
 
-// Ruta para MOST Analysis
-router.get('/MOST_Analysis/:projectUrl', authMiddleware, projectController.mostAnalysis);
+// Ruta para MOST Analysis con hoja específica
+router.get('/MOST_Analysis/:projectUrl/:sheetName', authMiddleware, projectController.mostAnalysis);
 
 // Nueva ruta para crear un proyecto en blanco
 router.post('/create-blank-project', authMiddleware, projectController.createBlankProject);
 
 // Ruta para guardar cambios
-router.post('/save-changes/:projectId', authMiddleware, projectController.saveChanges);
+router.post('/save-changes/:projectId/:sheetName', authMiddleware, projectController.saveChanges);
 
 // Ruta para agregar hojas
 router.post('/add-sheet', authMiddleware, projectController.addSheet);

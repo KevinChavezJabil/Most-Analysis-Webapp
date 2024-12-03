@@ -34,7 +34,7 @@
                     <div class="button-grid" id="project-buttons">
                         <% if (projects && projects.length > 0) { %>
                             <% projects.forEach(project => { %>
-                                <button class="dynamic-button" onclick="window.location.href='/MOST_Analysis/<%= project.url %>'">
+                                <button class="dynamic-button" onclick="window.location.href='/MOST_Analysis/<%= project.url %>/<%= project.firstSheetName %>'">
                                     <img src="/img/buildings.jpg" alt="Project image">
                                     <h3><%= project.name %></h3>
                                     <h4><%= new Date(project.creationDate).toLocaleDateString('es-ES') %></h4>

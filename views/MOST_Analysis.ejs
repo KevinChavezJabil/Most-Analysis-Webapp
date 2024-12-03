@@ -18,6 +18,13 @@
             border-radius: 5px;
             z-index: 1000;
         }
+        .error {
+            background-color: #f44336;
+        }
+        .sheet-tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -30,73 +37,79 @@
         <!-- Contenedor de las hojas -->
         <div id="sheetContainer">
             <!-- Tabla editable -->
-            <table id="mostTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Part Number</th>
-                        <th>Description</th>
-                        <th>Component</th>
-                        <th>Methods</th>
-                        <th>Quantity</th>
-                        <th>Cycle Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (currentSheet && currentSheet.data && currentSheet.data.length > 0) { %>
-                        <% currentSheet.data.forEach((row, index) => { %>
-                            <tr>
-                                <td><%= index + 1 %></td>
-                                <td contenteditable="true"><%= row['Part Number'] || '' %></td>
-                                <td contenteditable="true"><%= row['Description'] || '' %></td>
-                                <td contenteditable="true"><%= row['Component'] || '' %></td>
-                                <td contenteditable="true"><%= row['Methods'] || '' %></td>
-                                <td contenteditable="true"><%= row['Quantity'] || '' %></td>
-                                <td><span class="cycle-time"><%= row['Cycle Time'] || 0 %></span></td>
-                            </tr>
-                        <% }); %>
-                    <% } else { %>
-                        <!-- Filas vacías para entrada manual -->
+            <form id="saveChangesForm" method="POST" action="/save-changes/<%= project._id %>">
+                <input type="hidden" name="sheetName" value="<%= currentSheet.name %>">
+                <textarea name="rowDataArray" id="rowDataInput" hidden></textarea>
+                <table id="mostTable">
+                    <thead>
                         <tr>
-                            <td>1</td>
-                            <td contenteditable="true"></td>
-                            <td contenteditable="true"></td>
-                            <td contenteditable="true"></td>
-                            <td contenteditable="true"></td>
-                            <td contenteditable="true"></td>
-                            <td><span class="cycle-time">0</span></td>
+                            <th>#</th>
+                            <th>Part Number</th>
+                            <th>Description</th>
+                            <th>Component</th>
+                            <th>Methods</th>
+                            <th>Quantity</th>
+                            <th>Cycle Time</th>
                         </tr>
-                    <% } %>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="6">Total Cycle Time</td>
-                        <td><span id="totalCycleTime">0</span></td>
-                    </tr>
-                </tfoot>
-            </table>
-            <button id="addRowBtn">Add Row</button>
-            <button id="saveBtn">Save</button> <!-- Botón de Guardar -->
+                    </thead>
+                    <tbody>
+                        <% if (currentSheet && currentSheet.data && currentSheet.data.length > 0) { %>
+                            <% currentSheet.data.forEach((row, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td contenteditable="true"><%= row['Part Number'] || '' %></td>
+                                    <td contenteditable="true"><%= row['Description'] || '' %></td>
+                                    <td contenteditable="true"><%= row['Component'] || '' %></td>
+                                    <td contenteditable="true"><%= row['Methods'] || '' %></td>
+                                    <td contenteditable="true"><%= row['Quantity'] || '' %></td>
+                                    <td><span class="cycle-time"><%= row['Cycle Time'] || 0 %></span></td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <!-- Filas vacías para entrada manual -->
+                            <tr>
+                                <td>1</td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                                <td contenteditable="true"></td>
+                                <td><span class="cycle-time">0</span></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">Total Cycle Time</td>
+                            <td><span id="totalCycleTime">0</span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button type="button" id="addRowBtn">Add Row</button>
+                <button type="button" id="saveBtn">Save</button>
+            </form>
         </div>
 
         <!-- Barra inferior para hojas -->
-        <div id="sheetBar">
+        <div id="sheetBar" class="fixed-bottom">
             <% if (project && project.sheets && project.sheets.length > 0) { %>
-                <% project.sheets.forEach((sheet, index) => { %>
+                <% project.sheets.forEach((sheet) => { %>
                     <button 
                         class="sheet-tab <%= sheet.name === currentSheet.name ? 'active' : '' %>" 
-                        onclick="switchSheet('<%= index %>')">
+                        onclick="switchSheet('<%= sheet.name %>')">
                         <%= sheet.name %>
                     </button>
                 <% }); %>
             <% } %>
-            <button id="addSheetBtn">+</button>
+            <!-- Botón de agregar hoja -->
+            <button type="button" id="addSheetBtn">+</button>
         </div>
     </div>
 
     <!-- Contenedor de notificación -->
     <div id="notification">Changes saved successfully!</div>
 
+    <!-- Asegúrate de que el archivo JavaScript se cargue correctamente -->
     <script src="/js/MOST_Analysis.js"></script>
 </body>
 </html>

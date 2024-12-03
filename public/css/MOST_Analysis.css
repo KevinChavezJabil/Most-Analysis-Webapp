@@ -113,6 +113,72 @@ tfoot td span {
   font-weight: var(--font-medium);
 }
 
+/* Botones de "Save" y "Add Row" */
+#saveBtn, #addRowBtn {
+  padding: 10px 20px;
+  background-color: var(--first-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--body-font);
+  margin: 10px 5px;
+}
+
+#saveBtn:hover, #addRowBtn:hover {
+  background-color: #0e2b4e;
+}
+
+/* Estilos para las pestañas de hojas */
+.sheet-tab {
+  padding: 10px 20px;
+  background-color: var(--table-header-bg);
+  border: 1px solid var(--table-border-color);
+  border-bottom: none;
+  cursor: pointer;
+  font-family: var(--body-font);
+  margin-right: 5px;
+}
+
+.sheet-tab.active {
+  font-weight: var(--font-semi-bold);
+  background-color: #ffffff;
+  border-bottom: 2px solid var(--first-color);
+}
+
+#addSheetBtn {
+  padding: 10px 20px;
+  background-color: var(--first-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--body-font);
+}
+
+#addSheetBtn:hover {
+  background-color: #0e2b4e;
+}
+
+/* Barra de pestañas fija en la parte inferior */
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: var(--table-header-bg);
+  border-top: 1px solid var(--table-border-color);
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Ajustes para que el contenido principal no quede oculto detrás de la barra fija */
+.main-container {
+  padding-bottom: 60px; /* Ajustar según la altura de la barra fija */
+}
+
 /* MEDIA QUERIES */
 @media screen and (max-width: 768px) {
   h1 {

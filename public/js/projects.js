@@ -75,7 +75,9 @@ if (typeof document !== 'undefined') {
             projectList.forEach(project => {
                 const button = document.createElement('button');
                 button.className = 'dynamic-button';
-                button.onclick = () => window.location.href = `/MOST_Analysis/${project.url}`;
+                // Redirigir a la primera hoja del proyecto
+                const firstSheetName = project.firstSheetName ? project.firstSheetName : 'hoja1';
+                button.onclick = () => window.location.href = `/MOST_Analysis/${project.url}/${firstSheetName}`;
                 button.innerHTML = `
                     <img src="/img/buildings.jpg" alt="Project image">
                     <h3>${project.name}</h3>

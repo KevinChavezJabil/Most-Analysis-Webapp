@@ -105,31 +105,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Función para normalizar nombres de hojas
+    function normalizeSheetName(sheetName) {
+        return sheetName.toLowerCase().replace(/\s+/g, '_');
+    }
+
+    // Cambiar entre hojas
+    function switchSheet(sheetName) {
+        console.log(`Switching to sheet: ${sheetName}`); // Verificar que se está llamando a la función
+        const projectUrl = window.location.pathname.split('/')[2]; // Ajustar según la estructura de tu URL
+        const normalizedSheetName = normalizeSheetName(sheetName);
+        window.location.href = `/MOST_Analysis/${projectUrl}/${normalizedSheetName}`;
+    }
+
+    // Asegúrate de que la función esté disponible en el contexto global
+    window.switchSheet = switchSheet;
+
     // Agregar nueva hoja
-    addSheetBtn.addEventListener('click', async () => {
+    document.getElementById('addSheetBtn').addEventListener('click', async () => {
         const newSheetName = prompt("Enter new sheet name:");
         if (newSheetName) {
-            const projectUrl = window.location.pathname.split('/').pop();
+            const projectUrl = window.location.pathname.split('/')[2]; // Ajustar según la estructura de tu URL
+            const normalizedSheetName = normalizeSheetName(newSheetName);
             const response = await fetch('/add-sheet', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ projectUrl, newSheetName })
+                body: JSON.stringify({ projectUrl, newSheetName: normalizedSheetName })
             });
-
+    
             const result = await response.json();
             if (result.success) {
-                location.reload();
+                // Redirigir a la nueva hoja
+                window.location.href = `/MOST_Analysis/${projectUrl}/${normalizedSheetName}`;
             } else {
                 alert("Error adding sheet");
             }
         }
     });
-
-    // Cambiar entre hojas
-    window.switchSheet = (sheetIndex) => {
-        const projectUrl = window.location.pathname.split('/').pop();
-        window.location.href = `/MOST_Analysis/${projectUrl}?sheetIndex=${sheetIndex}`;
-    };
 });
