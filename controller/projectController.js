@@ -5,17 +5,19 @@ const xlsx = require('xlsx');
 
 exports.getProjects = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const projects = await Project.find({ owner: userId });
-        const projectNames = projects.map(project => project.name);
-        const projectsWithFirstSheet = projects.map(project => ({
-            ...project.toObject(),
-            firstSheetName: project.sheets.length > 0 ? project.sheets[0].name : 'hoja1'
+        const projects = await Project.find({ owner: req.user._id });
+
+        const projectList = projects.map(project => ({
+            name: project.name,
+            url: project.url,
+            creationDate: project.creationDate,
+            firstSheetId: project.sheets.length > 0 ? project.sheets[0]._id : null // ID de la primera hoja
         }));
-        res.render('projects', { projects: projectsWithFirstSheet, suggestions: projectNames });
+
+        res.render('projects', { projects: projectList, suggestions: projects.map(p => p.name) });
     } catch (error) {
         console.error('Error fetching projects:', error);
-        res.render('projects', { projects: [], suggestions: [] });
+        res.status(500).send('Error fetching projects');
     }
 };
 
@@ -47,19 +49,19 @@ exports.createBlankProject = async (req, res) => {
         const projectName = `Blank Project ${Date.now()}`;
         const projectUrl = `blank-project-${Date.now()}`;
         const creationDate = new Date();
-        const normalizedSheetName = 'sheet_1'; // Cambiar el nombre de la hoja inicial a inglés con guion bajo
 
+        const newSheet = { name: 'Sheet 1', data: [] }; // Inicializa una hoja con nombre por defecto
         const newProject = new Project({
             name: projectName,
             url: projectUrl,
             creationDate,
             owner: req.user._id,
-            excelData: { [normalizedSheetName]: [] }, // Proyecto en blanco con una hoja vacía
-            sheets: [{ name: normalizedSheetName, data: [] }] // Asegurarse de que haya al menos una hoja
+            sheets: [newSheet] // Agrega la hoja al proyecto
         });
 
-        await newProject.save();
-        res.redirect(`/MOST_Analysis/${projectUrl}/${normalizedSheetName}`);
+        const savedProject = await newProject.save();
+        const sheetId = savedProject.sheets[0]._id; // Obtén el ID de la hoja recién creada
+        res.redirect(`/MOST_Analysis/${projectUrl}/${sheetId}`);
     } catch (error) {
         console.error('Error creating blank project:', error);
         res.status(500).send('Error creating blank project');
@@ -134,22 +136,31 @@ exports.processSheets = async (req, res) => {
 };
 
 exports.mostAnalysis = async (req, res) => {
-    const { projectUrl, sheetName } = req.params;
+    const { projectUrl, sheetIdentifier } = req.params;
 
     try {
+        console.log("Buscando proyecto...");
         const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
         if (!project) {
+            console.log("Proyecto no encontrado");
             return res.status(404).send("Proyecto no encontrado");
         }
 
-        // Convertir los nombres de las hojas a minúsculas y reemplazar espacios con guiones bajos para la comparación
-        const normalizedSheetName = sheetName.toLowerCase().replace(/\s+/g, '_');
-        const currentSheet = project.sheets.find(sheet => sheet.name === normalizedSheetName);
+        console.log("Buscando hoja...");
+        // Buscar hoja por ID
+        const currentSheet = project.sheets.id(sheetIdentifier);
         if (!currentSheet) {
+            console.log("Hoja no encontrada");
             return res.status(404).send("Hoja no encontrada");
         }
 
-        res.render('MOST_Analysis', { project, currentSheet });
+        console.log("Obteniendo componentes y métodos...");
+        // Obtener todos los componentes y métodos
+        const components = await MechanicalComponent.find({});
+        const methods = await MechanicalAssembly.find({});
+
+        console.log("Renderizando vista...");
+        res.render('MOST_Analysis', { project, currentSheet, components, methods });
     } catch (error) {
         console.error('Error en MOST Analysis:', error);
         res.status(500).send('Hubo un error al cargar la página de análisis.');
@@ -165,16 +176,12 @@ exports.addSheet = async (req, res) => {
             return res.status(404).send("Proyecto no encontrado");
         }
 
-        // Normalizar el nombre de la hoja: convertir a minúsculas y reemplazar espacios con guiones bajos
-        const normalizedSheetName = newSheetName.toLowerCase().replace(/\s+/g, '_');
+        const newSheet = { name: newSheetName, data: [] };
+        project.sheets.push(newSheet);
+        await project.save();
 
-        if (!project.excelData[normalizedSheetName]) {
-            project.excelData[normalizedSheetName] = [];
-            project.sheets.push({ name: normalizedSheetName, data: [] });
-            await project.save();
-        }
-
-        res.json({ success: true });
+        const sheetId = project.sheets[project.sheets.length - 1]._id; // Obtén el ID de la hoja recién creada
+        res.json({ success: true, sheetId });
     } catch (error) {
         console.error('Error al agregar hoja:', error);
         res.json({ success: false });
@@ -182,29 +189,31 @@ exports.addSheet = async (req, res) => {
 };
 
 exports.saveChanges = async (req, res) => {
-    const { projectId } = req.params;
-    const { sheetName, rowDataArray } = req.body;
-
     try {
-        const project = await Project.findById(projectId);
+        const { projectId, sheetId } = req.params;
+        const changes = req.body; // Asegúrate de recibir los datos correctamente
+
+        // Busca el proyecto por la URL en lugar de por ID
+        const project = await Project.findOne({ url: projectId });
         if (!project) {
-            return res.status(404).json({ success: false, message: "Proyecto no encontrado" });
+            return res.status(404).send("Proyecto no encontrado");
         }
 
-        // Verificar si la hoja existe antes de actualizar
-        if (!project.excelData[sheetName]) {
-            return res.status(400).json({ success: false, message: "Hoja no encontrada" });
+        // Busca la hoja correspondiente en el proyecto
+        const sheet = project.sheets.id(sheetId);
+        if (!sheet) {
+            return res.status(404).send("Hoja no encontrada");
         }
 
-        // Actualizar los datos de la hoja
-        project.excelData[sheetName] = rowDataArray;
+        // Aplica los cambios a la hoja
+        sheet.data = changes.rowDataArray || sheet.data;
+        sheet.name = changes.name || sheet.name;
 
+        // Guarda el proyecto actualizado
         await project.save();
-        res.json({ success: true, message: "Cambios guardados exitosamente" });
+        res.status(200).json({ success: true, message: "Cambios guardados exitosamente" });
     } catch (error) {
-        console.error('Error al guardar cambios:', error);
-        res.status(500).json({ success: false, message: 'Error al guardar cambios', details: error.message });
+        console.error("Error al guardar cambios:", error);
+        res.status(500).json({ success: false, message: "Error al guardar cambios" });
     }
 };
-
-

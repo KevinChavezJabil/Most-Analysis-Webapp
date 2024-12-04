@@ -77,7 +77,7 @@ if (typeof document !== 'undefined') {
                 button.className = 'dynamic-button';
                 // Redirigir a la primera hoja del proyecto
                 const firstSheetName = project.firstSheetName ? project.firstSheetName : 'hoja1';
-                button.onclick = () => window.location.href = `/MOST_Analysis/${project.url}/${firstSheetName}`;
+                button.onclick = () => window.location.href = `/MOST_Analysis/${project.url}/${project.firstSheetId}`;
                 button.innerHTML = `
                     <img src="/img/buildings.jpg" alt="Project image">
                     <h3>${project.name}</h3>
