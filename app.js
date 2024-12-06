@@ -46,7 +46,10 @@ app.get('/settings', authMiddleware, (req, res) => {
 });
 
 app.get('/MOST_Analysis', authMiddleware, (req, res) => {
-    res.render('MOST_Analysis');
+    res.render('MOST_Analysis', {
+        components: JSON.stringify(components),
+        methods: JSON.stringify(methods),
+    });
 });
 
 app.get('/api/methods', async (req, res) => {

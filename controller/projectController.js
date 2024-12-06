@@ -147,7 +147,6 @@ exports.mostAnalysis = async (req, res) => {
         }
 
         console.log("Buscando hoja...");
-        // Buscar hoja por ID
         const currentSheet = project.sheets.id(sheetIdentifier);
         if (!currentSheet) {
             console.log("Hoja no encontrada");
@@ -155,12 +154,16 @@ exports.mostAnalysis = async (req, res) => {
         }
 
         console.log("Obteniendo componentes y métodos...");
-        // Obtener todos los componentes y métodos
         const components = await MechanicalComponent.find({});
         const methods = await MechanicalAssembly.find({});
 
         console.log("Renderizando vista...");
-        res.render('MOST_Analysis', { project, currentSheet, components, methods });
+        res.render('MOST_Analysis', { 
+            project, 
+            currentSheet, 
+            components: JSON.stringify(components), 
+            methods: JSON.stringify(methods) 
+        });
     } catch (error) {
         console.error('Error en MOST Analysis:', error);
         res.status(500).send('Hubo un error al cargar la página de análisis.');
@@ -206,6 +209,10 @@ exports.saveChanges = async (req, res) => {
         }
 
         // Aplica los cambios a la hoja
+        changes.rowDataArray.forEach((row) => {
+            row.methods = row.methods.map((methodId) => mongoose.Types.ObjectId(methodId));
+        });
+
         sheet.data = changes.rowDataArray || sheet.data;
         sheet.name = changes.name || sheet.name;
 

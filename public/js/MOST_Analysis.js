@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sheetId = document.querySelector('.sheet-tab.active').dataset.sheetId;
         const rows = tableBody.getElementsByTagName('tr');
         const rowDataArray = [];
-
+    
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             const methods = Array.from(row.cells[4].getElementsByTagName('select')).map(select => select.value);
@@ -118,9 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Fila ${i + 1}:`, rowData);
             rowDataArray.push(rowData);
         }
-
+    
         console.log("Datos enviados al servidor:", rowDataArray);
-
+    
         try {
             const response = await fetch(`/save-changes/${projectId}/${sheetId}`, {
                 method: 'POST',
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ rowDataArray })
             });
-
+    
             const result = await response.json();
             if (result.success) {
                 showNotification("Changes saved successfully!");

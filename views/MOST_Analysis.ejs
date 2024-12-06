@@ -143,8 +143,10 @@
 
     <!-- Contenedor de notificación -->
     <div id="notification">Changes saved successfully!</div>
-
-    <!-- Asegúrate de que el archivo JavaScript se cargue correctamente -->
     <script src="/js/MOST_Analysis.js"></script>
+    <script>
+        const components = JSON.parse('<%= components %>');
+        const methods = JSON.parse('<%= methods %>');
+    </script>  
 </body>
 </html>
