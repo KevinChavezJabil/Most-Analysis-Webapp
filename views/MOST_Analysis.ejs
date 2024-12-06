@@ -57,32 +57,32 @@
                             <% currentSheet.data.forEach((row, index) => { %>
                                 <tr>
                                     <td><%= index + 1 %></td>
-                                    <td contenteditable="true"><%= row['Part Number'] || '' %></td>
-                                    <td contenteditable="true"><%= row['Description'] || '' %></td>
+                                    <td contenteditable="true"><%= row.partNumber || '' %></td>
+                                    <td contenteditable="true"><%= row.description || '' %></td>
                                     <td>
                                         <select class="component-dropdown">
                                             <% components.forEach(component => { %>
-                                                <option value="<%= component._id %>" <%= row['Component'] === component._id ? 'selected' : '' %>><%= component.name %></option>
+                                                <option value="<%= component._id %>" <%= row.component === component._id ? 'selected' : '' %>><%= component.component %></option>
                                             <% }); %>
                                         </select>
                                     </td>
                                     <td>
                                         <div class="methods-container">
-                                            <% (row['Methods'] || []).forEach((method, methodIndex) => { %>
+                                            <% (row.methods || []).forEach((method, methodIndex) => { %>
                                                 <select class="method-dropdown">
                                                     <% methods.forEach(methodOption => { %>
-                                                        <option value="<%= methodOption._id %>" <%= method === methodOption._id ? 'selected' : '' %>><%= methodOption.name %></option>
+                                                        <option value="<%= methodOption._id %>" <%= method === methodOption._id ? 'selected' : '' %>><%= methodOption.method %></option>
                                                     <% }); %>
                                                 </select>
-                                                <% if (methodIndex < (row['Methods'] || []).length - 1) { %>
+                                                <% if (methodIndex < (row.methods || []).length - 1) { %>
                                                     <button type="button" class="remove-method-btn">-</button>
                                                 <% } %>
                                             <% }); %>
                                             <button type="button" class="add-method-btn">+</button>
                                         </div>
                                     </td>
-                                    <td contenteditable="true"><%= row['Quantity'] || '' %></td>
-                                    <td><span class="cycle-time"><%= row['Cycle Time'] || 0 %></span></td>
+                                    <td contenteditable="true"><%= row.quantity || '' %></td>
+                                    <td><span class="cycle-time"><%= row.cycleTime || 0 %></span></td>
                                 </tr>
                             <% }); %>
                         <% } else { %>
@@ -94,7 +94,7 @@
                                 <td>
                                     <select class="component-dropdown">
                                         <% components.forEach(component => { %>
-                                            <option value="<%= component._id %>"><%= component.name %></option>
+                                            <option value="<%= component._id %>"><%= component.component %></option>
                                         <% }); %>
                                     </select>
                                 </td>
@@ -102,7 +102,7 @@
                                     <div class="methods-container">
                                         <select class="method-dropdown">
                                             <% methods.forEach(method => { %>
-                                                <option value="<%= method._id %>"><%= method.name %></option>
+                                                <option value="<%= method._id %>"><%= method.method %></option>
                                             <% }); %>
                                         </select>
                                         <button type="button" class="add-method-btn">+</button>
@@ -145,8 +145,8 @@
     <div id="notification">Changes saved successfully!</div>
     <script src="/js/MOST_Analysis.js"></script>
     <script>
-        const components = JSON.parse('<%= components %>');
-        const methods = JSON.parse('<%= methods %>');
+        const components = <%= JSON.stringify(components) %>;
+        const methods = <%= JSON.stringify(methods) %>;
     </script>  
 </body>
 </html>

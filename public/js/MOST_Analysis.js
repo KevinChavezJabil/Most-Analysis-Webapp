@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 components.forEach(component => {
                     const option = document.createElement('option');
                     option.value = component._id;
-                    option.textContent = component.name;
+                    option.textContent = component.component;
                     select.appendChild(option);
                 });
                 newCell.appendChild(select);
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 methods.forEach(method => {
                     const option = document.createElement('option');
                     option.value = method._id;
-                    option.textContent = method.name;
+                    option.textContent = method.method;
                     select.appendChild(option);
                 });
                 methodsContainer.appendChild(select);
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             methods.forEach(method => {
                 const option = document.createElement('option');
                 option.value = method._id;
-                option.textContent = method.name;
+                option.textContent = method.method;
                 select.appendChild(option);
             });
             methodsContainer.insertBefore(select, event.target);
@@ -115,11 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Quantity': row.cells[5].textContent,
                 'Cycle Time': row.cells[6].textContent
             };
-            console.log(`Fila ${i + 1}:`, rowData);
             rowDataArray.push(rowData);
         }
-    
-        console.log("Datos enviados al servidor:", rowDataArray);
     
         try {
             const response = await fetch(`/save-changes/${projectId}/${sheetId}`, {

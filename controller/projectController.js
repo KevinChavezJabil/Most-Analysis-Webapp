@@ -139,31 +139,20 @@ exports.mostAnalysis = async (req, res) => {
     const { projectUrl, sheetIdentifier } = req.params;
 
     try {
-        console.log("Buscando proyecto...");
         const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
         if (!project) {
-            console.log("Proyecto no encontrado");
             return res.status(404).send("Proyecto no encontrado");
         }
 
-        console.log("Buscando hoja...");
         const currentSheet = project.sheets.id(sheetIdentifier);
         if (!currentSheet) {
-            console.log("Hoja no encontrada");
             return res.status(404).send("Hoja no encontrada");
         }
 
-        console.log("Obteniendo componentes y métodos...");
         const components = await MechanicalComponent.find({});
         const methods = await MechanicalAssembly.find({});
 
-        console.log("Renderizando vista...");
-        res.render('MOST_Analysis', { 
-            project, 
-            currentSheet, 
-            components: JSON.stringify(components), 
-            methods: JSON.stringify(methods) 
-        });
+        res.render('MOST_Analysis', { project, currentSheet, components, methods });
     } catch (error) {
         console.error('Error en MOST Analysis:', error);
         res.status(500).send('Hubo un error al cargar la página de análisis.');
