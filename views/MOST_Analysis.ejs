@@ -5,27 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOST Analysis - <%= project ? project.name : 'Untitled Project' %></title>
     <link rel="stylesheet" href="/css/MOST_Analysis.css">
-    <style>
-        /* Estilos para la notificación */
-        #notification {
-            display: none;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 1000;
-        }
-        .error {
-            background-color: #f44336;
-        }
-        .sheet-tab.active {
-            font-weight: bold;
-            border-bottom: 2px solid #4CAF50;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/notification.css">
 </head>
 <body>
     <!-- Sidebar o menú de navegación -->
@@ -143,10 +123,10 @@
 
     <!-- Contenedor de notificación -->
     <div id="notification">Changes saved successfully!</div>
-    <script src="/js/MOST_Analysis.js"></script>
     <script>
         const components = <%= JSON.stringify(components) %>;
         const methods = <%= JSON.stringify(methods) %>;
-    </script>  
+    </script>
+    <script src="/js/MOST_Analysis.js"></script>
 </body>
 </html>

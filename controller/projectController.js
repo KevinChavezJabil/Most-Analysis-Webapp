@@ -136,80 +136,90 @@ exports.processSheets = async (req, res) => {
 };
 
 exports.mostAnalysis = async (req, res) => {
-    const { projectUrl, sheetIdentifier } = req.params;
-
     try {
+        const { projectUrl, sheetIdentifier } = req.params;
+
         const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
-        if (!project) {
-            return res.status(404).send("Proyecto no encontrado");
-        }
+        if (!project) return res.status(404).send("Project not found");
 
         const currentSheet = project.sheets.id(sheetIdentifier);
-        if (!currentSheet) {
-            return res.status(404).send("Hoja no encontrada");
-        }
+        if (!currentSheet) return res.status(404).send("Sheet not found");
 
         const components = await MechanicalComponent.find({});
         const methods = await MechanicalAssembly.find({});
 
-        res.render('MOST_Analysis', { project, currentSheet, components, methods });
+        res.render('MOST_Analysis', {
+            project,
+            currentSheet,
+            components, // Array de { _id, name }
+            methods // Array de { _id, name }
+        });
     } catch (error) {
-        console.error('Error en MOST Analysis:', error);
-        res.status(500).send('Hubo un error al cargar la página de análisis.');
+        console.error("Error loading MOST Analysis:", error);
+        res.status(500).send("Error loading MOST Analysis");
     }
 };
 
 exports.addSheet = async (req, res) => {
-    const { projectUrl, newSheetName } = req.body;
-
     try {
-        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
-        if (!project) {
-            return res.status(404).send("Proyecto no encontrado");
+        // Encuentra los ObjectId de los métodos y componentes por nombre
+        const componentName = req.body.component; // Ejemplo: "Component 1"
+        const methodNames = req.body.methods; // Ejemplo: ["Method A", "Method B"]
+
+        const component = await MechanicalComponent.findOne({ name: componentName }).select('_id');
+        const methods = await MechanicalAssembly.find({ name: { $in: methodNames } }).select('_id');
+
+        if (!component || methods.length === 0) {
+            return res.status(404).json({ error: "Component or methods not found" });
         }
 
-        const newSheet = { name: newSheetName, data: [] };
+        // Crea una nueva hoja con los ObjectId
+        const newSheet = {
+            name: req.body.name,
+            data: req.body.data.map((row) => ({
+                partNumber: row.partNumber,
+                description: row.description,
+                quantity: row.quantity,
+                component: component._id,
+                methods: methods.map((method) => method._id),
+                cycleTime: row.cycleTime,
+            })),
+        };
+
+        // Agrega la hoja al proyecto
+        const project = await Project.findById(req.params.projectId);
+        if (!project) {
+            return res.status(404).json({ error: "Project not found" });
+        }
         project.sheets.push(newSheet);
         await project.save();
 
-        const sheetId = project.sheets[project.sheets.length - 1]._id; // Obtén el ID de la hoja recién creada
-        res.json({ success: true, sheetId });
+        res.status(200).json({ message: "Sheet added successfully", project });
     } catch (error) {
         console.error('Error al agregar hoja:', error);
-        res.json({ success: false });
+        res.status(500).json({ error: "Error al agregar hoja" });
     }
 };
 
 exports.saveChanges = async (req, res) => {
     try {
         const { projectId, sheetId } = req.params;
-        const changes = req.body; // Asegúrate de recibir los datos correctamente
+        const changes = req.body;
 
-        // Busca el proyecto por la URL en lugar de por ID
-        const project = await Project.findOne({ url: projectId });
-        if (!project) {
-            return res.status(404).send("Proyecto no encontrado");
-        }
+        const project = await Project.findById(projectId);
+        if (!project) return res.status(404).send("Project not found");
 
-        // Busca la hoja correspondiente en el proyecto
         const sheet = project.sheets.id(sheetId);
-        if (!sheet) {
-            return res.status(404).send("Hoja no encontrada");
-        }
+        if (!sheet) return res.status(404).send("Sheet not found");
 
-        // Aplica los cambios a la hoja
-        changes.rowDataArray.forEach((row) => {
-            row.methods = row.methods.map((methodId) => mongoose.Types.ObjectId(methodId));
-        });
-
-        sheet.data = changes.rowDataArray || sheet.data;
+        // Aplica los cambios de forma segura
         sheet.name = changes.name || sheet.name;
+        sheet.data = changes.rowDataArray || sheet.data;
 
-        // Guarda el proyecto actualizado
         await project.save();
-        res.status(200).json({ success: true, message: "Cambios guardados exitosamente" });
+        res.status(200).json({ success: true, message: "Changes saved successfully", sheet });
     } catch (error) {
-        console.error("Error al guardar cambios:", error);
-        res.status(500).json({ success: false, message: "Error al guardar cambios" });
+        console.error("Error saving changes:", error);
+        res.status(500).json({ error: "Error saving changes" });
     }
 };

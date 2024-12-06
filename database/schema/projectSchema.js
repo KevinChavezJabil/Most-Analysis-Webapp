@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Definición de SheetSchema como subdocumento
 const sheetSchema = new mongoose.Schema({
     name: String,
     data: [
@@ -9,7 +8,7 @@ const sheetSchema = new mongoose.Schema({
             description: String,
             quantity: Number,
             component: { type: mongoose.Schema.Types.ObjectId, ref: 'MechanicalComponent' },
-            methods: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MechanicalAssembly' }],
+            methods: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MechanicalAssembly' }], // Referencia
             cycleTime: Number,
         },
     ],
@@ -18,10 +17,9 @@ const sheetSchema = new mongoose.Schema({
 const projectSchema = new mongoose.Schema({
     name: String,
     url: String,
-    creationDate: Date,
+    creationDate: { type: Date, default: Date.now },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    sheets: { type: [sheetSchema], default: [] }, // Usamos subdocumentos
+    sheets: { type: [sheetSchema], default: [] }, // Subdocumentos
 });
 
 module.exports = mongoose.model('Project', projectSchema);
-

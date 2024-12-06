@@ -29,6 +29,6 @@ router.post('/create-blank-project', authMiddleware, projectController.createBla
 router.post('/save-changes/:projectId/:sheetId', authMiddleware, projectController.saveChanges);
 
 // Ruta para agregar hojas
-router.post('/add-sheet', authMiddleware, projectController.addSheet);
+router.post('/add-sheet/:projectId', projectController.addSheet);
 
 module.exports = router;

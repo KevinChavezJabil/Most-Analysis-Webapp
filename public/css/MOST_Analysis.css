@@ -44,6 +44,7 @@ body {
   max-width: 100%;
   width: 100%;
   padding: 20px;
+  padding-bottom: 60px; /* Ajustar según la altura de la barra fija */
 }
 
 .method-container {
@@ -174,9 +175,21 @@ tfoot td span {
   z-index: 1000;
 }
 
-/* Ajustes para que el contenido principal no quede oculto detrás de la barra fija */
-.main-container {
-  padding-bottom: 60px; /* Ajustar según la altura de la barra fija */
+/* Estilos para la notificación */
+#notification {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+}
+
+.error {
+  background-color: #f44336;
 }
 
 /* MEDIA QUERIES */
