@@ -160,6 +160,35 @@ exports.mostAnalysis = async (req, res) => {
     }
 };
 
+exports.getComponentsAndMethods = async (req, res) => {
+    try {
+        const components = await MechanicalComponent.find({});
+        const methods = await MechanicalAssembly.find({});
+        res.json({ components, methods });
+    } catch (error) {
+        console.error("Error fetching components and methods:", error);
+        res.status(500).json({ error: "Error fetching components and methods" });
+    }
+};
+
+exports.getCycleTime = async (req, res) => {
+    try {
+        const { componentId, methodIds } = req.query;
+        const component = await MechanicalComponent.findById(componentId);
+        const methods = await MechanicalAssembly.find({ _id: { $in: methodIds.split(',') } });
+
+        let totalCycleTime = component.standard_time;
+        methods.forEach(method => {
+            totalCycleTime += method.standard_time;
+        });
+
+        res.json({ cycleTime: totalCycleTime });
+    } catch (error) {
+        console.error("Error fetching cycle time:", error);
+        res.status(500).json({ error: "Error fetching cycle time" });
+    }
+};
+
 exports.addSheet = async (req, res) => {
     try {
         // Encuentra los ObjectId de los métodos y componentes por nombre

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOST Analysis - <%= project ? project.name : 'Untitled Project' %></title>
     <link rel="stylesheet" href="/css/MOST_Analysis.css">
-    <link rel="stylesheet" href="/css/notification.css">
 </head>
 <body>
     <!-- Sidebar o menú de navegación -->
@@ -126,6 +125,8 @@
     <script>
         const components = <%= JSON.stringify(components) %>;
         const methods = <%= JSON.stringify(methods) %>;
+        window.components = components;
+        window.methods = methods;
     </script>
     <script src="/js/MOST_Analysis.js"></script>
 </body>

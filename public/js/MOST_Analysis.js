@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const notification = document.getElementById('notification');
     let isModified = false;
 
-    addRowBtn.addEventListener('click', addRow);
+    addRowBtn.addEventListener('click', () => addRow('mostTable'));
     saveBtn.addEventListener('click', saveChanges);
     addSheetBtn.addEventListener('click', addSheet);
     tableBody.addEventListener('input', () => isModified = true);
@@ -14,34 +14,124 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    function addRow() {
-        const components = Array.isArray(window.components) ? window.components : [];
-        const methods = Array.isArray(window.methods) ? window.methods : [];
-        const newRow = document.createElement('tr');
-        const columns = [
-            { editable: false, content: '' },
-            { editable: true, content: '' },
-            { editable: true, content: '' },
-            { editable: false, content: createDropdown(components, 'component-dropdown') },
-            { editable: false, content: createMethodsContainer(methods) },
-            { editable: true, content: '' },
-            { editable: false, content: '<span class="cycle-time">0</span>' }
-        ];
-
-        columns.forEach((col, index) => {
-            const newCell = document.createElement('td');
-            if (col.editable) {
-                newCell.contentEditable = "true";
-                newCell.textContent = col.content;
-            } else {
-                newCell.innerHTML = col.content;
-            }
-            newRow.appendChild(newCell);
+    // Agregar eventos change a los dropdowns existentes
+    document.querySelectorAll('.component-dropdown, .method-dropdown').forEach(dropdown => {
+        dropdown.addEventListener('change', (event) => {
+            const rowId = event.target.closest('tr').id;
+            updateCycleTime(rowId);
         });
+    });
 
-        tableBody.appendChild(newRow);
-        updateRowNumbers();
-        isModified = true;
+    // Función para agregar una fila a la tabla con las columnas predeterminadas
+    function addRow(tableId) {
+        fetch('/get-components-and-methods')
+            .then(response => response.json())
+            .then(data => {
+                const components = data.components;
+                const methods = data.methods;    
+                const tableBody = document.querySelector(`#${tableId} tbody`);
+                const newRow = document.createElement('tr');
+                const columns = [
+                    { editable: false, content: '' },
+                    { editable: true, content: '' },
+                    { editable: true, content: '' },
+                    { editable: false, content: createDropdown(components, 'component-dropdown') },
+                    { editable: false, content: createMethodsContainer(methods) },
+                    { editable: true, content: '' },
+                    { editable: false, content: '<span class="cycle-time">0</span>' }
+                ];
+                columns.forEach((col, index) => {
+                    const newCell = document.createElement('td');
+                    if (col.editable) {
+                        newCell.contentEditable = "true";
+                        newCell.textContent = col.content;
+                    } else {
+                        newCell.innerHTML = col.content;
+                    }
+                    newRow.appendChild(newCell);
+                });
+                tableBody.appendChild(newRow);
+                updateRowNumbers(tableId);
+                isModified = true;
+
+                // Agregar eventos change a los nuevos dropdowns
+                newRow.querySelectorAll('.component-dropdown, .method-dropdown').forEach(dropdown => {
+                    dropdown.addEventListener('change', (event) => {
+                        const rowId = event.target.closest('tr').id;
+                        updateCycleTime(rowId);
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching components and methods:', error);
+            });
+    }
+
+    // Función para actualizar la numeración de las filas
+    function updateRowNumbers(tableId) {
+        const tableBody = document.querySelector(`#${tableId} tbody`);
+        const rows = tableBody.getElementsByTagName('tr');
+        Array.from(rows).forEach((row, index) => {
+            row.cells[0].textContent = index + 1;
+        });
+    }
+
+    // Función para eliminar una fila específica y reenumerar las filas
+    function deleteRow(tableId, rowIndex) {
+        const tableBody = document.querySelector(`#${tableId} tbody`);
+        const rows = tableBody.getElementsByTagName('tr');
+        if (rowIndex >= 0 && rowIndex < rows.length) {
+            tableBody.removeChild(rows[rowIndex]);
+            updateRowNumbers(tableId);
+            isModified = true;
+        }
+    }
+
+    // Función para cargar opciones en los dropdowns
+    function loadDropdownOptions(columnType, keywords) {
+        const options = columnType === 'Component' ? window.components : window.methods;
+        return options.filter(option => keywords.some(keyword => option.name.includes(keyword)));
+    }
+
+    function updateCycleTime(rowId) {
+        const row = document.getElementById(rowId);
+        const componentId = row.querySelector('.component-dropdown').value;
+        const methodIds = Array.from(row.querySelectorAll('.method-dropdown')).map(select => select.value);
+    
+        fetch(`/api/get-cycle-time?componentId=${componentId}&methodIds=${methodIds.join(',')}`)
+            .then(response => response.json())
+            .then(data => {
+                const cycleTimeCell = row.querySelector('.cycle-time');
+                cycleTimeCell.textContent = data.cycleTime;
+                updateTotalCycleTime();
+            })
+            .catch(error => {
+                console.error('Error fetching cycle time:', error);
+            });
+    }
+    
+    function updateTotalCycleTime() {
+        const tableBody = document.querySelector('#mostTable tbody');
+        const rows = tableBody.getElementsByTagName('tr');
+        let totalCycleTime = 0;
+        Array.from(rows).forEach(row => {
+            totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent);
+        });
+        document.getElementById('totalCycleTime').textContent = totalCycleTime;
+    }
+
+    // Función para calcular el tiempo de ciclo de una fila
+    function calculateRowCycleTime(rowId) {
+        const row = document.getElementById(rowId);
+        const cycleTimeCells = row.querySelectorAll('.cycle-time');
+        return Array.from(cycleTimeCells).reduce((total, cell) => total + parseFloat(cell.textContent), 0);
+    }
+
+    // Función para calcular el tiempo de ciclo de toda la tabla
+    function calculateTableCycleTime(tableId) {
+        const tableBody = document.querySelector(`#${tableId} tbody`);
+        const rows = tableBody.getElementsByTagName('tr');
+        return Array.from(rows).reduce((total, row) => total + calculateRowCycleTime(row.id), 0);
     }
 
     function createDropdown(options, className) {
@@ -62,13 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         methodsContainer.innerHTML = createDropdown(methods, 'method-dropdown') + 
                                      '<button type="button" class="add-method-btn">+</button>';
         return methodsContainer.outerHTML;
-    }
-
-    function updateRowNumbers() {
-        const rows = tableBody.getElementsByTagName('tr');
-        Array.from(rows).forEach((row, index) => {
-            row.cells[0].textContent = index + 1;
-        });
     }
 
     function handleTableClick(event) {

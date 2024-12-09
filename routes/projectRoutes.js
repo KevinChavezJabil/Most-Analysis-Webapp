@@ -31,4 +31,8 @@ router.post('/save-changes/:projectId/:sheetId', authMiddleware, projectControll
 // Ruta para agregar hojas
 router.post('/add-sheet/:projectId', projectController.addSheet);
 
+router.get('/get-components-and-methods', projectController.getComponentsAndMethods);
+
+router.get('/api/get-cycle-time', projectController.getCycleTime);
+
 module.exports = router;
