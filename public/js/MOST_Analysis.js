@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Agregar eventos input a las celdas de cantidad
+    document.querySelectorAll('td:nth-child(6)').forEach(cell => {
+        cell.addEventListener('input', (event) => {
+            const rowId = event.target.closest('tr').id;
+            updateCycleTime(rowId);
+        });
+    });
+
     // Función para agregar una fila a la tabla con las columnas predeterminadas
     function addRow(tableId) {
         fetch('/get-components-and-methods')
@@ -31,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const methods = data.methods;    
                 const tableBody = document.querySelector(`#${tableId} tbody`);
                 const newRow = document.createElement('tr');
+                newRow.id = `row-${Date.now()}`; // Asigna un ID único a la fila
+    
                 const columns = [
                     { editable: false, content: '' },
                     { editable: true, content: '' },
@@ -53,10 +63,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(newRow);
                 updateRowNumbers(tableId);
                 isModified = true;
-
+    
                 // Agregar eventos change a los nuevos dropdowns
                 newRow.querySelectorAll('.component-dropdown, .method-dropdown').forEach(dropdown => {
                     dropdown.addEventListener('change', (event) => {
+                        const rowId = event.target.closest('tr').id;
+                        updateCycleTime(rowId);
+                    });
+                });
+
+                // Agregar eventos input a las celdas de cantidad
+                newRow.querySelectorAll('td:nth-child(6)').forEach(cell => {
+                    cell.addEventListener('input', (event) => {
                         const rowId = event.target.closest('tr').id;
                         updateCycleTime(rowId);
                     });
@@ -95,14 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateCycleTime(rowId) {
         const row = document.getElementById(rowId);
+        if (!row) {
+            console.error(`Row with ID ${rowId} not found`);
+            return;
+        }
+    
         const componentId = row.querySelector('.component-dropdown').value;
         const methodIds = Array.from(row.querySelectorAll('.method-dropdown')).map(select => select.value);
+        const quantity = parseFloat(row.querySelector('td:nth-child(6)').textContent) || 0; // Obtener la cantidad, tomar 0 si está vacío
     
         fetch(`/api/get-cycle-time?componentId=${componentId}&methodIds=${methodIds.join(',')}`)
             .then(response => response.json())
             .then(data => {
                 const cycleTimeCell = row.querySelector('.cycle-time');
-                cycleTimeCell.textContent = data.cycleTime;
+                const cycleTime = parseFloat(data.cycleTime) * quantity; // Multiplicar por la cantidad
+                cycleTimeCell.textContent = cycleTime.toFixed(2); // Redondear a 2 decimales
                 updateTotalCycleTime();
             })
             .catch(error => {
@@ -115,9 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const rows = tableBody.getElementsByTagName('tr');
         let totalCycleTime = 0;
         Array.from(rows).forEach(row => {
-            totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent);
+            totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent) || 0;
         });
-        document.getElementById('totalCycleTime').textContent = totalCycleTime;
+        document.getElementById('totalCycleTime').textContent = totalCycleTime.toFixed(2); // Redondear a 2 decimales
     }
 
     // Función para calcular el tiempo de ciclo de una fila

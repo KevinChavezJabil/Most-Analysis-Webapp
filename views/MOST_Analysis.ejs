@@ -32,70 +32,70 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (currentSheet && currentSheet.data && currentSheet.data.length > 0) { %>
-                            <% currentSheet.data.forEach((row, index) => { %>
-                                <tr>
-                                    <td><%= index + 1 %></td>
-                                    <td contenteditable="true"><%= row.partNumber || '' %></td>
-                                    <td contenteditable="true"><%= row.description || '' %></td>
-                                    <td>
-                                        <select class="component-dropdown">
-                                            <% components.forEach(component => { %>
-                                                <option value="<%= component._id %>" <%= row.component === component._id ? 'selected' : '' %>><%= component.component %></option>
-                                            <% }); %>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <div class="methods-container">
-                                            <% (row.methods || []).forEach((method, methodIndex) => { %>
-                                                <select class="method-dropdown">
-                                                    <% methods.forEach(methodOption => { %>
-                                                        <option value="<%= methodOption._id %>" <%= method === methodOption._id ? 'selected' : '' %>><%= methodOption.method %></option>
-                                                    <% }); %>
-                                                </select>
-                                                <% if (methodIndex < (row.methods || []).length - 1) { %>
-                                                    <button type="button" class="remove-method-btn">-</button>
-                                                <% } %>
-                                            <% }); %>
-                                            <button type="button" class="add-method-btn">+</button>
-                                        </div>
-                                    </td>
-                                    <td contenteditable="true"><%= row.quantity || '' %></td>
-                                    <td><span class="cycle-time"><%= row.cycleTime || 0 %></span></td>
-                                </tr>
-                            <% }); %>
-                        <% } else { %>
-                            <!-- Filas vacías para entrada manual -->
-                            <tr>
-                                <td>1</td>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
-                                <td>
-                                    <select class="component-dropdown">
-                                        <% components.forEach(component => { %>
-                                            <option value="<%= component._id %>"><%= component.component %></option>
-                                        <% }); %>
-                                    </select>
-                                </td>
-                                <td>
-                                    <div class="methods-container">
-                                        <select class="method-dropdown">
-                                            <% methods.forEach(method => { %>
-                                                <option value="<%= method._id %>"><%= method.method %></option>
-                                            <% }); %>
-                                        </select>
-                                        <button type="button" class="add-method-btn">+</button>
-                                    </div>
-                                </td>
-                                <td contenteditable="true"></td>
-                                <td><span class="cycle-time">0</span></td>
-                            </tr>
-                        <% } %>
-                    </tbody>
+    <% if (currentSheet && currentSheet.data && currentSheet.data.length > 0) { %>
+        <% currentSheet.data.forEach((row, index) => { %>
+            <tr id="row-<%= index %>">
+                <td><%= index + 1 %></td>
+                <td contenteditable="true"><%= row.partNumber || '' %></td>
+                <td contenteditable="true"><%= row.description || '' %></td>
+                <td>
+                    <select class="component-dropdown">
+                        <% components.forEach(component => { %>
+                            <option value="<%= component._id %>" <%= row.component === component._id ? 'selected' : '' %>><%= component.component %></option>
+                        <% }); %>
+                    </select>
+                </td>
+                <td>
+                    <div class="methods-container">
+                        <% (row.methods || []).forEach((method, methodIndex) => { %>
+                            <select class="method-dropdown">
+                                <% methods.forEach(methodOption => { %>
+                                    <option value="<%= methodOption._id %>" <%= method === methodOption._id ? 'selected' : '' %>><%= methodOption.method %></option>
+                                <% }); %>
+                            </select>
+                            <% if (methodIndex < (row.methods || []).length - 1) { %>
+                                <button type="button" class="remove-method-btn">-</button>
+                            <% } %>
+                        <% }); %>
+                        <button type="button" class="add-method-btn">+</button>
+                    </div>
+                </td>
+                <td contenteditable="true"><%= row.quantity || '' %></td>
+                <td><span class="cycle-time"><%= row.cycleTime || 0 %></span></td>
+            </tr>
+        <% }); %>
+    <% } else { %>
+        <!-- Fila inicial vacía para entrada manual -->
+        <tr id="row-0">
+            <td>1</td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td>
+                <select class="component-dropdown">
+                    <% components.forEach(component => { %>
+                        <option value="<%= component._id %>"><%= component.component %></option>
+                    <% }); %>
+                </select>
+            </td>
+            <td>
+                <div class="methods-container">
+                    <select class="method-dropdown">
+                        <% methods.forEach(method => { %>
+                            <option value="<%= method._id %>"><%= method.method %></option>
+                        <% }); %>
+                    </select>
+                    <button type="button" class="add-method-btn">+</button>
+                </div>
+            </td>
+            <td contenteditable="true"></td>
+            <td><span class="cycle-time">0.00</span></td>
+        </tr>
+    <% } %>
+</tbody>
                     <tfoot>
                         <tr>
                             <td colspan="6">Total Cycle Time</td>
-                            <td><span id="totalCycleTime">0</span></td>
+                            <td><span id="totalCycleTime">0.00</span></td>
                         </tr>
                     </tfoot>
                 </table>
