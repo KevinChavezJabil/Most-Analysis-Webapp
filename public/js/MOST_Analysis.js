@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const methods = data.methods;    
                 const tableBody = document.querySelector(`#${tableId} tbody`);
                 const newRow = document.createElement('tr');
-                newRow.id = `row-${Date.now()}`; // Asigna un ID único a la fila
+                newRow.id = `row-${Date.now()}`;
     
                 const columns = [
                     { editable: false, content: '' },
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     { editable: false, content: createDropdown(components, 'component-dropdown') },
                     { editable: false, content: createMethodsContainer(methods) },
                     { editable: true, content: '' },
-                    { editable: false, content: '<span class="cycle-time">0</span>' }
+                    { editable: false, content: '<span class="cycle-time">0.00</span>' }
                 ];
                 columns.forEach((col, index) => {
                     const newCell = document.createElement('td');
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 const cycleTimeCell = row.querySelector('.cycle-time');
                 const cycleTime = parseFloat(data.cycleTime) * quantity; // Multiplicar por la cantidad
-                cycleTimeCell.textContent = cycleTime.toFixed(2); // Redondear a 2 decimales
+                cycleTimeCell.textContent = cycleTime.toFixed(2); 
                 updateTotalCycleTime();
             })
             .catch(error => {
@@ -148,19 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Array.from(rows).forEach(row => {
             totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent) || 0;
         });
-        document.getElementById('totalCycleTime').textContent = totalCycleTime.toFixed(2); // Redondear a 2 decimales
-    }
-
-    function calculateRowCycleTime(rowId) {
-        const row = document.getElementById(rowId);
-        const cycleTimeCells = row.querySelectorAll('.cycle-time');
-        return Array.from(cycleTimeCells).reduce((total, cell) => total + parseFloat(cell.textContent), 0);
-    }
-
-    function calculateTableCycleTime(tableId) {
-        const tableBody = document.querySelector(`#${tableId} tbody`);
-        const rows = tableBody.getElementsByTagName('tr');
-        return Array.from(rows).reduce((total, row) => total + calculateRowCycleTime(row.id), 0);
+        document.getElementById('totalCycleTime').textContent = totalCycleTime.toFixed(2) + 's'; 
     }
 
     function createDropdown(options, className) {
@@ -293,42 +281,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function fetchMethods() {
-        try {
-            const response = await fetch('/get-methods');
-            const methods = await response.json();
-            return methods;
-        } catch (error) {
-            console.error('Error fetching methods:', error);
-            return [];
-        }
-    }
-
     async function addSheet() {
-        const newSheetName = prompt("Enter new sheet name:");
-        if (newSheetName) {
+        try {
             const projectUrl = window.location.pathname.split('/')[2];
-            const methods = await fetchMethods(); // Obtener métodos desde el backend
+            const response = await fetch(`/add-sheet/${projectUrl}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
     
-            try {
-                const response = await fetch('/add-sheet', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ projectUrl, newSheetName, methods })
-                });
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     
-                const result = await response.json();
-                if (result.success) {
-                    window.location.href = `/MOST_Analysis/${projectUrl}/${result.sheetId}`;
-                } else {
-                    alert(result.message || "Error adding sheet");
-                }
-            } catch (error) {
-                console.error('Error adding sheet:', error);
-            }
+            const result = await response.json();
+            console.log('Hoja agregada:', result);
+    
+            // Notificar al usuario
+            alert(`Nueva hoja agregada: ${result.sheet.name}`);
+    
+            // Actualizar la lista de hojas dinámicamente
+            await fetchSheets(); // Función para cargar las hojas actuales
+        } catch (error) {
+            console.error('Error adding sheet:', error);
+            alert('No se pudo agregar la hoja.');
         }
     }
-
+    
+    // Función para obtener y renderizar las hojas
+    async function fetchSheets() {
+        const projectUrl = window.location.pathname.split('/')[2]; // Obtiene 'blank-project-XXXX'
+        try {
+            const response = await fetch(`/get-sheets/${projectUrl}`);
+            if (!response.ok) throw new Error('Error al obtener las hojas');
+            const sheets = await response.json();
+    
+            // Aquí actualizas la interfaz con las hojas
+            const sheetList = document.getElementById('sheetList');
+            sheetList.innerHTML = ''; // Limpia la lista actual
+            sheets.forEach(sheet => {
+                const sheetItem = document.createElement('li');
+                sheetItem.textContent = sheet.name;
+                sheetList.appendChild(sheetItem);
+            });
+        } catch (error) {
+            console.error('Error fetching sheets:', error);
+        }
+    }    
+    
     function switchSheet(sheetId) {
         const projectUrl = window.location.pathname.split('/')[2];
         window.location.href = `/MOST_Analysis/${projectUrl}/${sheetId}`;

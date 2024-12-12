@@ -121,42 +121,45 @@ exports.getCycleTime = async (req, res) => {
 
 exports.addSheet = async (req, res) => {
     try {
-        // Encuentra los ObjectId de los métodos y componentes por nombre
-        const componentName = req.body.component; // Ejemplo: "Component 1"
-        const methodNames = req.body.methods; // Ejemplo: ["Method A", "Method B"]
+        const { projectUrl } = req.params; // Se toma el URL desde la ruta
 
-        const component = await MechanicalComponent.findOne({ name: componentName }).select('_id');
-        const methods = await MechanicalAssembly.find({ name: { $in: methodNames } }).select('_id');
-
-        if (!component || methods.length === 0) {
-            return res.status(404).json({ error: "Component or methods not found" });
-        }
-
-        // Crea una nueva hoja con los ObjectId
-        const newSheet = {
-            name: req.body.name,
-            data: req.body.data.map((row) => ({
-                partNumber: row.partNumber,
-                description: row.description,
-                quantity: row.quantity,
-                component: component._id,
-                methods: methods.map((method) => method._id),
-                cycleTime: row.cycleTime,
-            })),
-        };
-
-        // Agrega la hoja al proyecto
-        const project = await Project.findById(req.params.projectId);
+        // Busca el proyecto por el URL
+        const project = await Project.findOne({ url: projectUrl });
         if (!project) {
             return res.status(404).json({ error: "Project not found" });
         }
+
+        // Determinar el nombre de la nueva hoja
+        const sheetCount = project.sheets.length;
+        const newSheetName = `Sheet ${sheetCount + 1}`;
+
+        // Crear la nueva hoja
+        const newSheet = {
+            name: newSheetName,
+            data: [],
+        };
+
+        // Agregar la nueva hoja al proyecto
         project.sheets.push(newSheet);
         await project.save();
 
-        res.status(200).json({ message: "Sheet added successfully", project });
+        res.status(200).json({ message: "Sheet added successfully", sheet: newSheet });
     } catch (error) {
         console.error('Error al agregar hoja:', error);
         res.status(500).json({ error: "Error al agregar hoja" });
+    }
+};
+
+exports.getSheets = async (req, res) => {
+    try {
+        const project = await Project.findOne({ url: req.params.projectUrl }).select('sheets');
+        if (!project) {
+            return res.status(404).json({ message: 'Proyecto no encontrado' });
+        }
+        res.json(project.sheets); // Devuelve las hojas del proyecto
+    } catch (error) {
+        console.error('Error al obtener las hojas:', error);
+        res.status(500).json({ message: 'Error al obtener las hojas' });
     }
 };
 
