@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Llama a fetchMethods al cargar la página
     fetchMethods();
 
     addRowBtn.addEventListener('click', () => addRow('mostTable'));
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Agregar eventos change a los dropdowns existentes
     document.querySelectorAll('.component-dropdown, .method-dropdown').forEach(dropdown => {
         dropdown.addEventListener('change', (event) => {
             const rowId = event.target.closest('tr').id;
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Agregar eventos input a las celdas de cantidad
     document.querySelectorAll('td:nth-child(6)').forEach(cell => {
         cell.addEventListener('input', (event) => {
             const rowId = event.target.closest('tr').id;
@@ -217,13 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function removeMethod(button) {
-        const methodsContainer = button.parentElement;
-        methodsContainer.removeChild(button.previousElementSibling);
-        methodsContainer.removeChild(button);
-        const addButton = methodsContainer.querySelector('.add-method-btn');
-        if (addButton) {
-            addButton.style.display = 'inline-block';
-        }
+        //logica para quitar metodos
     }
 
     function showNotification(message) {
@@ -259,10 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 showNotification("Changes saved successfully!");
                 isModified = false;
             } else {
-                alert("Error al guardar cambios");
+                alert("Error saving changes");
             }
         } catch (error) {
-            console.error('Error al guardar cambios:', error);
+            console.error('Error saving changes:', error);
         }
     }
 
@@ -275,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleBeforeUnload(e) {
         if (isModified) {
-            const confirmationMessage = "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir sin guardar?";
+            const confirmationMessage = "You have unsaved changes, are you sure you want to exit without saving?";
             e.returnValue = confirmationMessage;
             return confirmationMessage;
         }
@@ -293,21 +284,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
             const result = await response.json();
             console.log('Hoja agregada:', result);
-    
-            // Notificar al usuario
+
             alert(`Nueva hoja agregada: ${result.sheet.name}`);
     
-            // Actualizar la lista de hojas dinámicamente
-            await fetchSheets(); // Función para cargar las hojas actuales
+            await fetchSheets(); 
         } catch (error) {
             console.error('Error adding sheet:', error);
             alert('No se pudo agregar la hoja.');
         }
     }
     
-    // Función para obtener y renderizar las hojas
     async function fetchSheets() {
-        const projectUrl = window.location.pathname.split('/')[2]; // Obtiene 'blank-project-XXXX'
+        const projectUrl = window.location.pathname.split('/')[2];
         try {
             const response = await fetch(`/get-sheets/${projectUrl}`);
             if (!response.ok) throw new Error('Error al obtener las hojas');

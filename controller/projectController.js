@@ -65,31 +65,6 @@ exports.processSheets = async (req, res) => {
 //logica para procesar las hojas seleccionadas
 };
 
-exports.mostAnalysis = async (req, res) => {
-    try {
-        const { projectUrl, sheetIdentifier } = req.params;
-
-        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
-        if (!project) return res.status(404).send("Project not found");
-
-        const currentSheet = project.sheets.id(sheetIdentifier);
-        if (!currentSheet) return res.status(404).send("Sheet not found");
-
-        const components = await MechanicalComponent.find({});
-        const methods = await MechanicalAssembly.find({});
-
-        res.render('MOST_Analysis', {
-            project,
-            currentSheet,
-            components, // Array de { _id, name }
-            methods // Array de { _id, name }
-        });
-    } catch (error) {
-        console.error("Error loading MOST Analysis:", error);
-        res.status(500).send("Error loading MOST Analysis");
-    }
-};
-
 exports.getComponentsAndMethods = async (req, res) => {
     try {
         const components = await MechanicalComponent.find({});
@@ -119,27 +94,48 @@ exports.getCycleTime = async (req, res) => {
     }
 };
 
+exports.mostAnalysis = async (req, res) => {
+    try {
+        const { projectUrl, sheetIdentifier } = req.params;
+
+        const project = await Project.findOne({ url: projectUrl, owner: req.user._id });
+        if (!project) return res.status(404).send("Project not found");
+
+        const currentSheet = project.sheets.id(sheetIdentifier);
+        if (!currentSheet) return res.status(404).send("Sheet not found");
+
+        const components = await MechanicalComponent.find({});
+        const methods = await MechanicalAssembly.find({});
+
+        res.render('MOST_Analysis', {
+            project,
+            currentSheet,
+            components,
+            methods 
+        });
+    } catch (error) {
+        console.error("Error loading MOST Analysis:", error);
+        res.status(500).send("Error loading MOST Analysis");
+    }
+};
+
 exports.addSheet = async (req, res) => {
     try {
-        const { projectUrl } = req.params; // Se toma el URL desde la ruta
+        const { projectUrl } = req.params; 
 
-        // Busca el proyecto por el URL
         const project = await Project.findOne({ url: projectUrl });
         if (!project) {
             return res.status(404).json({ error: "Project not found" });
         }
 
-        // Determinar el nombre de la nueva hoja
         const sheetCount = project.sheets.length;
         const newSheetName = `Sheet ${sheetCount + 1}`;
 
-        // Crear la nueva hoja
         const newSheet = {
             name: newSheetName,
             data: [],
         };
 
-        // Agregar la nueva hoja al proyecto
         project.sheets.push(newSheet);
         await project.save();
 
