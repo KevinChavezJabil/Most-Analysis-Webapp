@@ -12,6 +12,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const moment = require('moment');
 const xlsx = require('xlsx');
+const User = require('./database/schema/Schema'); // Asegúrate de importar el modelo de usuario
 
 app.set('view engine', 'ejs');
 Connection();
@@ -41,8 +42,14 @@ app.get('/excelUpload', authMiddleware, (req, res) => {
     res.render('excelUpload');
 });
 
-app.get('/settings', authMiddleware, (req, res) => {
-    res.render('settings');
+app.get('/settings', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        res.render('settings', { user });
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).send('Error fetching user data');
+    }
 });
 
 app.get('/MOST_Analysis', authMiddleware, (req, res) => {
@@ -70,6 +77,20 @@ app.use('/api', checkEmailRoute);
 
 app.use(authMiddleware, (req, res, next) => {
     res.status(404).render('404');
+});
+
+app.post('/settings/update', authMiddleware, async (req, res) => {
+    const { field, value } = req.body;
+    const userId = req.user._id; // Usamos el ID del usuario desde el middleware de autenticación
+
+    try {
+        // Actualiza el campo correspondiente en la base de datos
+        await User.findByIdAndUpdate(userId, { [field]: value });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.json({ success: false });
+    }
 });
 
 app.listen(port, () => {

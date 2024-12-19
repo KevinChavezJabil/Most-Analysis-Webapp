@@ -4,22 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
-    <link href="/css/home.css" rel="stylesheet" type="text/css">
+    <link href="/css/settings.css" rel="stylesheet" type="text/css">
+</head>
+<body>
     <%- include('../views/templates/sidebar.ejs') %>
 
     <div class="main-container">
-        <!-- Contenedor para la imagen -->
-        <div class="image-container">
-            <img class="login__img" src="/img/p2.png" alt="Login image" />
-        </div>
-        <!-- Contenedor para el texto -->
-        <div class="text-container">
-            <div class="hero-content">
-                <h1>Rocket MOST</h1>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
-                <a href="/learn-more" class="cta-button">Learn More</a>
+        <div class="settings-container">
+            <div class="profile-picture">
+                <div class="initials-circle"><%= user.first_name.charAt(0) + user.last_name.charAt(0) %></div>
+            </div>
+            <div class="settings-field">
+                <label for="name">Name</label>
+                <div class="field-content">
+                    <input type="text" id="name" value="<%= user.first_name %>" readonly>
+                    <button class="edit-button" onclick="editField('name')">Edit</button>
+                </div>
+                <span class="error-message" id="name-error"></span>
+            </div>
+            <div class="settings-field">
+                <label for="lastName">Last Name</label>
+                <div class="field-content">
+                    <input type="text" id="lastName" value="<%= user.last_name %>" readonly>
+                    <button class="edit-button" onclick="editField('lastName')">Edit</button>
+                </div>
+                <span class="error-message" id="lastName-error"></span>
+            </div>
+            <div class="settings-field">
+                <label for="email">Email</label>
+                <div class="field-content">
+                    <input type="email" id="email" value="<%= user.email %>" readonly>
+                    <button class="edit-button" onclick="editField('email')">Edit</button>
+                </div>
+                <span class="error-message" id="email-error"></span>
+            </div>
+            <div class="settings-field">
+                <label for="password">Password</label>
+                <div class="field-content">
+                    <input type="password" id="password" value="********" readonly>
+                    <button class="edit-button" onclick="editField('password')">Edit</button>
+                </div>
+                <span class="error-message" id="password-error"></span>
             </div>
         </div>
     </div>
+
+    <script src="/js/settings.js"></script>
 </body>
 </html>
+
+

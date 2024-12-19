@@ -112,7 +112,7 @@ exports.mostAnalysis = async (req, res) => {
             currentSheet,
             components,
             methods 
-        });
+        });        
     } catch (error) {
         console.error("Error loading MOST Analysis:", error);
         res.status(500).send("Error loading MOST Analysis");

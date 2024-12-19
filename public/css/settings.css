@@ -1,0 +1,102 @@
+/* Variables de colores y fuentes */
+:root {
+    --first-color: #163e6a;
+    --second-color: #537091;
+    --text-white: #ffffff;
+    --text-black: #000000;
+    --body-font: 'Poppins', sans-serif;
+}
+
+/* Estilos básicos */
+body {
+    font-family: var(--body-font);
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.settings-container {
+    background-color: var(--text-white);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+.profile-picture {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.initials-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--second-color);
+    color: var(--text-white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.settings-field {
+    margin-bottom: 20px;
+}
+
+.settings-field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.field-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.field-content input {
+    border: none;
+    background: none;
+    font-size: 1.2rem;
+    color: var(--text-black);
+    width: 70%;
+}
+
+.field-content input[readonly] {
+    border-bottom: 1px solid transparent;
+}
+
+.field-content input:focus {
+    outline: none;
+    border-bottom: 1px solid var(--first-color);
+}
+
+.edit-button {
+    background-color: var(--first-color);
+    color: var(--text-white);
+    border: none;
+    padding: 7px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background-color: var(--second-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
