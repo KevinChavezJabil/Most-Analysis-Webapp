@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
     <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="/css/templates/sidebar.css">
 </head>
@@ -5,6 +11,9 @@
     <header class="header" id="header">
         <div class="header__toggle">
             <i class='bx bx-menu' id="header-toggle"></i>
+        </div>
+        <div class="header__user">
+            <div class="initials-circle-sidebar"><%= user.first_name.charAt(0) + user.last_name.charAt(0) %></div>
         </div>
     </header>
 
@@ -41,3 +50,5 @@
         </nav>
     </div>
     <script src="/js/sidebar.js"></script>
+</body>
+</html>

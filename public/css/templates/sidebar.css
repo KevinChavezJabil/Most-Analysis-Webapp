@@ -78,6 +78,26 @@ a {
   padding-left: 30px;
 }
 
+.header__user {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.initials-circle-sidebar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #537091; 
+  color: #ffffff; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+}
+
 /*===== NAV =====*/
 .l-navbar {
   position: fixed;

@@ -1,3 +1,6 @@
+/*===== GOOGLE FONTS =====*/
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
 /* Variables de colores y fuentes */
 :root {
     --first-color: #163e6a;
@@ -36,17 +39,18 @@ body {
     margin-bottom: 30px;
 }
 
-.initials-circle {
-    width: 100px;
-    height: 100px;
+.initials {
+    width: 120px; /* Aumentar el tamaño del círculo */
+    height: 120px; /* Aumentar el tamaño del círculo */
     border-radius: 50%;
     background-color: var(--second-color);
     color: var(--text-white);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.5rem;
+    font-size: 4rem; /* Aumentar el tamaño de las iniciales */
     font-weight: bold;
+    font-family: var(--body-font); /* Asegurarse de que la fuente sea Poppins */
 }
 
 .settings-field {
@@ -68,7 +72,7 @@ body {
 .field-content input {
     border: none;
     background: none;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--text-black);
     width: 70%;
 }

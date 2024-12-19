@@ -16,6 +16,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     req.user = user;
+    res.locals.user = user; // Hacer que el usuario esté disponible en todas las vistas
     next();
   } catch (error) {
     console.error('Auth Middleware Error:', error);
