@@ -40,17 +40,17 @@ body {
 }
 
 .initials {
-    width: 120px; /* Aumentar el tamaño del círculo */
-    height: 120px; /* Aumentar el tamaño del círculo */
+    width: 200px; 
+    height: 200px; 
     border-radius: 50%;
     background-color: var(--second-color);
     color: var(--text-white);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 4rem; /* Aumentar el tamaño de las iniciales */
+    font-size: 6rem; 
     font-weight: bold;
-    font-family: var(--body-font); /* Asegurarse de que la fuente sea Poppins */
+    font-family: var(--body-font); 
 }
 
 .settings-field {
@@ -86,17 +86,15 @@ body {
     border-bottom: 1px solid var(--first-color);
 }
 
-.edit-button {
-    background-color: var(--first-color);
-    color: var(--text-white);
-    border: none;
-    padding: 7px 15px;
-    border-radius: 4px;
+.edit-icon {
+    font-size: 1.5rem;
+    color: var(--second-color);
     cursor: pointer;
+    opacity: 80%;
 }
 
-.edit-button:hover {
-    background-color: var(--second-color);
+.edit-icon:hover {
+    color: var(--first-color);
 }
 
 .error-message {
