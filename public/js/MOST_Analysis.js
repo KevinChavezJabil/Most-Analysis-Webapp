@@ -284,10 +284,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
             const result = await response.json();
             console.log('Hoja agregada:', result);
-
+    
+            // Mostrar alerta con el nombre de la nueva hoja
             alert(`Nueva hoja agregada: ${result.sheet.name}`);
     
-            await fetchSheets(); 
+            // Crear el nuevo botón dinámicamente
+            const sheetBar = document.getElementById('sheetList'); // Lista donde se agregan las hojas
+            if (sheetBar) {
+                const newButton = document.createElement('button');
+                newButton.className = 'sheet-tab'; // Asegúrate de que coincide con la clase CSS
+                newButton.textContent = result.sheet.name;
+                newButton.dataset.sheetId = result.sheet._id; // Asigna el ID de la hoja correctamente
+                newButton.onclick = () => switchSheet(result.sheet._id); // Asignar la función al click
+                
+                // Insertar el botón antes del botón de agregar
+                const addButton = document.getElementById('addSheetBtn');
+                sheetBar.insertBefore(newButton, addButton);
+            }
+    
         } catch (error) {
             console.error('Error adding sheet:', error);
             alert('No se pudo agregar la hoja.');
@@ -301,8 +315,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Error al obtener las hojas');
             const sheets = await response.json();
     
-            // Aquí actualizas la interfaz con las hojas
             const sheetList = document.getElementById('sheetList');
+            if (!sheetList) {
+                console.error('Elemento sheetList no encontrado');
+                return;
+            }
+    
             sheetList.innerHTML = ''; // Limpia la lista actual
             sheets.forEach(sheet => {
                 const sheetItem = document.createElement('li');
@@ -312,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching sheets:', error);
         }
-    }    
+    }  
     
     function switchSheet(sheetId) {
         const projectUrl = window.location.pathname.split('/')[2];

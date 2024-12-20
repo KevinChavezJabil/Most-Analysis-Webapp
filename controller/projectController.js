@@ -139,7 +139,8 @@ exports.addSheet = async (req, res) => {
         project.sheets.push(newSheet);
         await project.save();
 
-        res.status(200).json({ message: "Sheet added successfully", sheet: newSheet });
+        const savedSheet = project.sheets[project.sheets.length - 1]; // Obtén la hoja recién creada
+        res.status(200).json({ message: "Sheet added successfully", sheet: savedSheet });
     } catch (error) {
         console.error('Error al agregar hoja:', error);
         res.status(500).json({ error: "Error al agregar hoja" });

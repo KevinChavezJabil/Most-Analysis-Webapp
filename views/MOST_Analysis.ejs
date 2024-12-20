@@ -106,19 +106,20 @@
 
         <!-- Barra inferior para hojas -->
         <div id="sheetBar" class="fixed-bottom">
-            <% if (project && project.sheets && project.sheets.length > 0) { %>
-                <% project.sheets.forEach((sheet) => { %>
-                    <button 
-                        class="sheet-tab <%= sheet.name === currentSheet.name ? 'active' : '' %>" 
-                        data-sheet-id="<%= sheet._id %>"
-                        onclick="switchSheet('<%= sheet._id %>')">
-                        <%= sheet.name %>
-                    </button>
-                <% }); %>
-            <% } %>
-            <button type="button" id="addSheetBtn">+</button>
+            <ul id="sheetList">
+                <% if (project && project.sheets && project.sheets.length > 0) { %>
+                    <% project.sheets.forEach((sheet) => { %>
+                        <button 
+                            class="sheet-tab <%= sheet.name === currentSheet.name ? 'active' : '' %>" 
+                            data-sheet-id="<%= sheet._id %>"
+                            onclick="switchSheet('<%= sheet._id %>')">
+                            <%= sheet.name %>
+                        </button>
+                    <% }); %>
+                <% } %>
+                <button type="button" id="addSheetBtn">+</button> <!-- Mueve este botón dentro del ul -->
+            </ul>
         </div>
-    </div>
 
     <!-- Contenedor de notificación -->
     <div id="notification">Changes saved successfully!</div>
