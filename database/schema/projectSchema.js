@@ -8,7 +8,7 @@ const sheetSchema = new mongoose.Schema({
             description: String,
             quantity: Number,
             component: { type: mongoose.Schema.Types.ObjectId, ref: 'MechanicalComponent' },
-            methods: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MechanicalAssembly' }], // Referencia
+            methods: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MechanicalAssembly' }], 
             cycleTime: Number,
         },
     ],
@@ -19,7 +19,7 @@ const projectSchema = new mongoose.Schema({
     url: String,
     creationDate: { type: Date, default: Date.now },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    sheets: { type: [sheetSchema], default: [] }, // Subdocumentos
+    sheets: { type: [sheetSchema], default: [] }, 
 });
 
 module.exports = mongoose.model('Project', projectSchema);

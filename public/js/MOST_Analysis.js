@@ -1,4 +1,52 @@
 let methods = [];
+
+function updateCycleTime(rowId) {
+    const row = document.getElementById(rowId);
+    if (!row) {
+        console.error(`Row with ID ${rowId} not found`);
+        return;
+    }
+
+    const componentId = row.querySelector('.component-dropdown').value;
+    const methodIds = Array.from(row.querySelectorAll('.method-dropdown')).map(select => select.value);
+    const quantityCell = row.querySelector('td:nth-child(6)');
+    const quantity = parseFloat(quantityCell.textContent) || 0; // Trata el contenido vacío como 0
+
+    // Si algún campo está vacío, el tiempo de ciclo se queda en 0
+    if (!componentId || methodIds.includes('') || quantity <= 0) {
+        row.querySelector('.cycle-time').textContent = '0.00';
+        updateTotalCycleTime();
+        return;
+    }
+
+    // Realizar el cálculo si los campos están completos
+    fetch(`/api/get-cycle-time?componentId=${componentId}&methodIds=${methodIds.join(',')}`)
+        .then(response => response.json())
+        .then(data => {
+            const cycleTimeCell = row.querySelector('.cycle-time');
+            const cycleTime = parseFloat(data.cycleTime) * quantity; // Multiplicar por la cantidad
+            cycleTimeCell.textContent = cycleTime.toFixed(2); 
+            updateTotalCycleTime();
+        })
+        .catch(error => {
+            console.error('Error fetching cycle time:', error);
+        });
+}
+
+window.updateCycleTime = updateCycleTime;
+
+function updateTotalCycleTime() {
+    const tableBody = document.querySelector('#mostTable tbody');
+    const rows = tableBody.getElementsByTagName('tr');
+    let totalCycleTime = 0;
+    Array.from(rows).forEach(row => {
+        totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent) || 0;
+    });
+    document.getElementById('totalCycleTime').textContent = totalCycleTime.toFixed(2) + 's'; 
+}
+
+window.updateTotalCycleTime = updateTotalCycleTime;
+
 document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.querySelector('#mostTable tbody');
     const addRowBtn = document.getElementById('addRowBtn');
@@ -105,48 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateCycleTime(rowId) {
-        const row = document.getElementById(rowId);
-        if (!row) {
-            console.error(`Row with ID ${rowId} not found`);
-            return;
-        }
-
-        const componentId = row.querySelector('.component-dropdown').value;
-        const methodIds = Array.from(row.querySelectorAll('.method-dropdown')).map(select => select.value);
-        const quantityCell = row.querySelector('td:nth-child(6)');
-        const quantity = parseFloat(quantityCell.textContent) || 0; // Trata el contenido vacío como 0
-
-        // Si algún campo está vacío, el tiempo de ciclo se queda en 0
-        if (!componentId || methodIds.includes('') || quantity <= 0) {
-            row.querySelector('.cycle-time').textContent = '0.00';
-            updateTotalCycleTime();
-            return;
-        }
-
-        // Realizar el cálculo si los campos están completos
-        fetch(`/api/get-cycle-time?componentId=${componentId}&methodIds=${methodIds.join(',')}`)
-            .then(response => response.json())
-            .then(data => {
-                const cycleTimeCell = row.querySelector('.cycle-time');
-                const cycleTime = parseFloat(data.cycleTime) * quantity; // Multiplicar por la cantidad
-                cycleTimeCell.textContent = cycleTime.toFixed(2); 
-                updateTotalCycleTime();
-            })
-            .catch(error => {
-                console.error('Error fetching cycle time:', error);
-            });
-    }    
+    updateCycleTime(rowId);
     
-    function updateTotalCycleTime() {
-        const tableBody = document.querySelector('#mostTable tbody');
-        const rows = tableBody.getElementsByTagName('tr');
-        let totalCycleTime = 0;
-        Array.from(rows).forEach(row => {
-            totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent) || 0;
-        });
-        document.getElementById('totalCycleTime').textContent = totalCycleTime.toFixed(2) + 's'; 
-    }
+    updateTotalCycleTime();
 
     function createDropdown(options, className) {
         const select = document.createElement('select');
@@ -160,11 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return select.outerHTML;
     }    
 
+    //modificar el esilo del contenedor
     function createMethodsContainer(methods) {
         const methodsContainer = document.createElement('div');
-        methodsContainer.classList.add('methods-container');
+        methodsContainer.classList.add('method-container');
         methodsContainer.innerHTML = createDropdown(methods, 'method-dropdown') + 
-                                     '<button type="button" class="add-method-btn">+</button>';
+                                     '<button type="button" class="add-method-btn">ADD</button>' +
+                                     '<button type="button" class="remove-method-btn">REMOVE</button>';
         return methodsContainer.outerHTML;
     }
 
@@ -197,11 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
                 methodsContainer.insertBefore(select, button);
     
-                // Mostrar máximo 8 dropdowns
-                if (methodsContainer.getElementsByTagName('select').length >= 8) {
-                    button.style.display = 'none';
-                }
-    
                 // Agregar evento para actualizar ciclo
                 select.addEventListener('change', (event) => {
                     const rowId = event.target.closest('tr').id;
@@ -213,8 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
     
-    function removeMethod(button) {
-        //logica para quitar metodos
+    function removeMethod() {
+        const methodsContainer = button.parentElement; 
+        const methodDropdowns = methodsContainer.getElementsByClassName('method-dropdown');
+        
+        if (methodDropdowns.lenght > 1) {
+            methodsContainer.removeChild(methodDropdowns[methodDropdowns.length - 1]);
+        }
     }
 
     function showNotification(message) {
@@ -229,13 +240,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const projectId = window.location.pathname.split('/')[2];
         const sheetId = document.querySelector('.sheet-tab.active').dataset.sheetId;
         const rows = tableBody.getElementsByTagName('tr');
+
         const rowDataArray = Array.from(rows).map(row => ({
-            'Part Number': row.cells[1].textContent,
-            'Description': row.cells[2].textContent,
-            'Component': row.cells[3].querySelector('select').value,
-            'Methods': Array.from(row.cells[4].getElementsByTagName('select')).map(select => select.value),
-            'Quantity': row.cells[5].textContent,
-            'Cycle Time': row.cells[6].textContent
+            partNumber: row.cells[1].textContent.trim(),
+            description: row.cells[2].textContent.trim(),
+            component: row.cells[3].querySelector('select').value,
+            methods: Array.from(row.cells[4].getElementsByTagName('select')).map(select => select.value) || [],
+            quantity: Number(row.cells[5].textContent.trim()),
+            cycleTime: parseFloat(row.cells[6].textContent.trim() || 0 )
         }));
 
         try {

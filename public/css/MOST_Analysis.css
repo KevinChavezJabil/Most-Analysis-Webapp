@@ -49,8 +49,13 @@ body {
 
 .method-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
+}
+.method-button-container{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
 }
 
 .add-method-btn, .remove-method-btn {

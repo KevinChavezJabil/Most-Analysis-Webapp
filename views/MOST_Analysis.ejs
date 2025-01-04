@@ -11,7 +11,7 @@
     <%- include('../views/templates/sidebar.ejs') %>
 
     <div class="main-container">
-        <h1>MOST Analysis for Project: <%= project ? project.name : 'Untitled Project' %></h1>
+        <h1><%= project ? project.name : 'Untitled Project' %></h1>
 
         <!-- Contenedor de las hojas -->
         <div id="sheetContainer">
@@ -19,7 +19,7 @@
             <form id="saveChangesForm" method="POST" action="/save-changes/<%= project._id %>">
                 <input type="hidden" name="sheetName" value="<%= currentSheet.name %>">
                 <textarea name="rowDataArray" id="rowDataInput" hidden></textarea>
-                <table id="mostTable">
+                <table id="mostTable" class="table-body">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -41,23 +41,21 @@
                 <td>
                     <select class="component-dropdown">
                         <% components.forEach(component => { %>
-                            <option value="<%= component._id %>" <%= row.component === component._id ? 'selected' : '' %>><%= component.component %></option>
+                            <option value="<%= component._id %>" <%= row.component.equals(component._id) ? 'selected' : '' %>><%= component.component %></option>
                         <% }); %>
                     </select>
                 </td>
                 <td>
-                    <div class="methods-container">
+                    <div class="method-container">
                         <% (row.methods || []).forEach((method, methodIndex) => { %>
                             <select class="method-dropdown">
                                 <% methods.forEach(methodOption => { %>
-                                    <option value="<%= methodOption._id %>" <%= method === methodOption._id ? 'selected' : '' %>><%= methodOption.method %></option>
+                                    <option value="<%= methodOption._id %>" <%= method.equals(methodOption._id) ? 'selected' : '' %>><%= methodOption.method %></option>
                                 <% }); %>
                             </select>
-                            <% if (methodIndex < (row.methods || []).length - 1) { %>
-                                <button type="button" class="remove-method-btn">-</button>
-                            <% } %>
                         <% }); %>
-                        <button type="button" class="add-method-btn">+</button>
+                        <button type="button" class="add-method-btn">ADD</button>
+                        <button type="button" class="remove-method-btn">REMOVE</button>
                     </div>
                 </td>
                 <td contenteditable="true"><%= row.quantity || '' %></td>
@@ -78,13 +76,14 @@
                 </select>
             </td>
             <td>
-                <div class="methods-container">
+                <div class="method-container">
                     <select class="method-dropdown">
                         <% methods.forEach(method => { %>
                             <option value="<%= method._id %>"><%= method.method %></option>
                         <% }); %>
                     </select>
-                    <button type="button" class="add-method-btn">+</button>
+                    <button type="button" class="add-method-btn">ADD</button>
+                    <button type="button" class="remove-method-btn">REMOVE</button>
                 </div>
             </td>
             <td contenteditable="true"></td>
@@ -130,5 +129,57 @@
         window.methods = methods;
     </script>
     <script src="/js/MOST_Analysis.js"></script>
+    <script>
+        document.addEventListener('click', function(event) { 
+            if (event.target.classList.contains('add-method-btn')) { 
+                   
+            } if (event.target.classList.contains('remove-method-btn')) { 
+                const container = event.target.closest('.method-container'); 
+                const dropdowns = container.querySelectorAll('.method-dropdown'); 
+                if (dropdowns.length > 1) {
+                    container.removeChild(dropdowns[dropdowns.length - 1]);
+                }                   
+            }
+            const rowId = event.target.closest('tr').id;
+
+            console.log(rowId);
+
+            updateCycleTime(rowId);
+        }); 
+    </script>
+    <script> 
+    function updateTotalCycleTime() { 
+        const tableBody = document.querySelector('#mostTable tbody'); 
+        const rows = tableBody.getElementsByTagName('tr'); 
+        let totalCycleTime = 0; 
+        Array.from(rows).forEach(row => { 
+            totalCycleTime += parseFloat(row.querySelector('.cycle-time').textContent) || 0; 
+        }); 
+        document.getElementById('totalCycleTime').textContent = totalCycleTime.toFixed(2) + 's'; 
+    } 
+    document.addEventListener('DOMContentLoaded', () => { 
+        document.querySelectorAll('tr').forEach(row => { 
+            const rowId = row.id; if (rowId) { 
+                updateCycleTime(rowId); 
+            } 
+        }); 
+        setTimeout(() => { 
+            updateTotalCycleTime(); 
+        }, 1000); 
+        document.addEventListener('click', function(event) { 
+            if (event.target.classList.contains('add-method-btn')) { 
+                } if (event.target.classList.contains('remove-method-btn')) { 
+                    const container = event.target.closest('.method-container'); 
+                    const dropdowns = container.querySelectorAll('.method-dropdown'); 
+                    if (dropdowns.length > 1) { 
+                        container.removeChild(dropdowns[dropdowns.length - 1]); 
+                        const rowId = event.target.closest('tr').id;
+                        updateCycleTime(rowId); 
+                    } 
+                } 
+            }); 
+        }); 
+        window.updateTotalCycleTime = updateTotalCycleTime; 
+    </script>
 </body>
 </html>

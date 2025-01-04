@@ -5,14 +5,14 @@ const app = express();
 const port = 3000;
 const Connection = require("./database/db");
 const authRoute = require("./routes/route");
-const projectRoutes = require('./routes/projectRoutes'); // Nueva ruta de proyectos
+const projectRoutes = require('./routes/projectRoutes'); 
 const authMiddleware = require('./middleware/auth');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const moment = require('moment');
 const xlsx = require('xlsx');
-const User = require('./database/schema/Schema'); // Asegúrate de importar el modelo de usuario
+const User = require('./database/schema/Schema'); 
 
 app.set('view engine', 'ejs');
 Connection();

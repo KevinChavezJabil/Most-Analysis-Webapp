@@ -1,4 +1,5 @@
 const Project = require('../database/schema/projectSchema');
+const mongoose = require('mongoose');
 const MechanicalAssembly = require('../database/schema/MechanicalAssembly');
 const MechanicalComponent = require('../database/schema/MechanicalComponent');
 const xlsx = require('xlsx');
@@ -163,17 +164,22 @@ exports.getSheets = async (req, res) => {
 exports.saveChanges = async (req, res) => {
     try {
         const { projectId, sheetId } = req.params;
-        const changes = req.body;
+        const { rowDataArray } = req.body;
 
-        const project = await Project.findById(projectId);
+        const project = await Project.findOne({ url: projectId });
         if (!project) return res.status(404).send("Project not found");
 
         const sheet = project.sheets.id(sheetId);
         if (!sheet) return res.status(404).send("Sheet not found");
 
-        // Aplica los cambios de forma segura
-        sheet.name = changes.name || sheet.name;
-        sheet.data = changes.rowDataArray || sheet.data;
+        sheet.data = rowDataArray.map(item => ({
+            partNumber: item.partNumber,
+            description: item.description,
+            quantity: item.quantity,
+            component: new mongoose.Types.ObjectId(item.component),
+            methods: (item.methods || []).map(method => new mongoose.Types.ObjectId(method)),
+            cycleTime: item.cycleTime || 0
+        }))
 
         await project.save();
         res.status(200).json({ success: true, message: "Changes saved successfully", sheet });
