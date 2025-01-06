@@ -6,13 +6,13 @@ const xlsx = require('xlsx');
 
 exports.getProjects = async (req, res) => {
     try {
-        const projects = await Project.find({ owner: req.user._id });
+        const projects = await Project.find({ owner: req.user._id }).sort({ creationDate: -1 });
 
         const projectList = projects.map(project => ({
             name: project.name,
             url: project.url,
             creationDate: project.creationDate,
-            firstSheetId: project.sheets.length > 0 ? project.sheets[0]._id : null // ID de la primera hoja
+            firstSheetId: project.sheets.length > 0 ? project.sheets[0]._id : null
         }));
 
         res.render('projects', { projects: projectList, suggestions: projects.map(p => p.name) });
