@@ -36,8 +36,8 @@
         <% currentSheet.data.forEach((row, index) => { %>
             <tr id="row-<%= index %>">
                 <td><%= index + 1 %></td>
-                <td contenteditable="true"><%= row.partNumber || '' %></td>
-                <td contenteditable="true"><%= row.description || '' %></td>
+                <td contenteditable="true" class="limited paste-listener" data-max-length="25"><%= row.partNumber || '' %></td>
+                <td contenteditable="true" class="limited paste-listener" data-max-length="100"><%= row.description || '' %></td>
                 <td>
                     <select class="component-dropdown">
                         <% components.forEach(component => { %>
@@ -58,7 +58,7 @@
                         <button type="button" class="remove-method-btn">REMOVE</button>
                     </div>
                 </td>
-                <td contenteditable="true"><%= row.quantity || '' %></td>
+                <td contenteditable="true" class="limited" data-max-length="5"><%= row.quantity || '' %></td>
                 <td><span class="cycle-time"><%= row.cycleTime || 0 %></span></td>
             </tr>
         <% }); %>
@@ -66,8 +66,8 @@
         <!-- Fila inicial vacía para entrada manual -->
         <tr id="row-0">
             <td>1</td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
+            <td contenteditable="true" class="limited paste-listener" data-max-length="25"></td>
+            <td contenteditable="true" class="limited paste-listener" data-max-length="100"></td>
             <td>
                 <select class="component-dropdown">
                     <% components.forEach(component => { %>
@@ -86,7 +86,7 @@
                     <button type="button" class="remove-method-btn">REMOVE</button>
                 </div>
             </td>
-            <td contenteditable="true"></td>
+            <td contenteditable="true" class="limited" data-max-length="5"></td>
             <td><span class="cycle-time">0.00</span></td>
         </tr>
     <% } %>
@@ -179,7 +179,87 @@
                 } 
             }); 
         }); 
-        window.updateTotalCycleTime = updateTotalCycleTime; 
+        window.updateTotalCycleTime = updateTotalCycleTime;
+
+        document.querySelectorAll('td[contenteditable="true"].limited').forEach(
+            cell => { 
+                cell.addEventListener(
+                    'input', 
+                    function() { 
+                        const maxLength = this.getAttribute('data-max-length'); 
+                        if (this.textContent.length > maxLength) { 
+                            this.textContent = this.textContent.slice(0, maxLength); 
+                            alert(`This field is limited to ${maxLength} characters.`); 
+                        } 
+                    }
+                ); 
+            }
+        );
+        
+        document.querySelectorAll('td.paste-listener').forEach(cell => {
+            cell.addEventListener('paste',
+                function(event) {
+                    event.preventDefault();
+
+                    const text = (event.clipboardData || window.clipboardData).getData('text');
+                    console.log("Texto pegado:", text); // Verificar el contenido pegado
+                    const rows = text.split('\n').map(row => row.split('\t'));
+                    console.log("Filas procesadas:", rows);
+
+                    const tableBody = document.querySelector('#mostTable tbody');
+                    rows.forEach(rowData => {
+
+                        rowData = rowData.map(cell => cell.replace(/\r/g, ''));
+
+                        if (rowData.length === 1) {
+                            rowData = [rowData[0], '', ''];
+                        }
+
+                        const newRow = tableBody.insertRow();
+                        const index = tableBody.rows.length;
+                        newRow.id = `row-${index}`;
+                        newRow.innerHTML = 
+                            `
+                <td>${index}</td>
+                <td contenteditable="true" class="limited paste-listener" data-max-length="25">${rowData[0] || ''}</td>
+                <td contenteditable="true" class="limited paste-listener" data-max-length="100">${rowData[1] || ''}</td>
+                <td>
+                    <select class="component-dropdown">
+                        <% components.forEach(component => { %>
+                            <option value="<%= component._id %>"><%= component.component %></option>
+                        <% }); %>
+                    </select>
+                </td>
+                <td>
+                    <div class="method-container">
+                            <select class="method-dropdown">
+                                <% methods.forEach(methodOption => { %>
+                                    <option value="<%= methodOption._id %>"><%= methodOption.method %></option>
+                                <% }); %>
+                            </select>
+                        <button type="button" class="add-method-btn">ADD</button>
+                        <button type="button" class="remove-method-btn">REMOVE</button>
+                    </div>
+                </td>
+                <td contenteditable="true" class="limited" data-max-length="5">${rowData[2] || ''}</td>
+                <td><span class="cycle-time">0.00</span></td>
+            </tr>
+                            `;
+
+                        console.log("Nueva fila creada:", newRow);
+
+                        newRow.querySelectorAll('td.paste-listener').forEach(cell => {
+                            cell.addEventListener('paste',
+                                function(event) {
+                                    event.preventDefault();
+                                }
+                            )
+                        })
+                        }                
+                    );
+                }
+            )
+        });
     </script>
 </body>
 </html>

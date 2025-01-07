@@ -47,6 +47,13 @@ function updateTotalCycleTime() {
 
 window.updateTotalCycleTime = updateTotalCycleTime;
 
+function switchSheet(sheetId) {
+    const projectUrl = window.location.pathname.split('/')[2];
+    window.location.href = `/MOST_Analysis/${projectUrl}/${sheetId}`;
+}
+
+window.switchSheet = switchSheet;
+
 document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.querySelector('#mostTable tbody');
     const addRowBtn = document.getElementById('addRowBtn');
@@ -343,11 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching sheets:', error);
         }
     }  
-    
-    function switchSheet(sheetId) {
-        const projectUrl = window.location.pathname.split('/')[2];
-        window.location.href = `/MOST_Analysis/${projectUrl}/${sheetId}`;
-    }
 
-    window.switchSheet = switchSheet;
+    switchSheet(sheetId);
+
 });
