@@ -131,21 +131,48 @@ input[type="file"]:hover + .drop-zone i {
 }
 
 .cta-button {
-  display: inline-block;
-  font-size: var(--h2-font-size);
-  padding: 12.5px 25px;
-  background-color: var(--first-color);
-  color: #ffffff;
-  font-weight: var(--font-light);
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 25px;
   border-radius: 5px;
+  font-size: 1rem;
+  font-weight: var(--font-medium);
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.cta-button-primary {
+  background-color: var(--first-color);
+}
+
+.cta-button-primary:hover {
+  background-color: #0e2b4e;
+}
+
+.cta-button-secondary {
+  background-color: var(--second-color);
+  color: #ffffff;
+}
+
+.cta-button-secondary:hover {
+  background-color: #7799AA;
+}
+
+.download-container {
+  text-align: center;
   margin-top: 20px;
 }
 
-.cta-button:hover {
-  background-color: #0e2b4e;
+.download-text {
+  font-size: 1rem;
+  font-weight: var(--font-light);
+  color: var(--text-color);
+  margin-bottom: 10px;
 }
+
 
 /* MEDIA QUERIES */
 @media screen and (max-width: 768px) {

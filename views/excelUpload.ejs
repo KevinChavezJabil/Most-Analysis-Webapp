@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload BOM File</title>
+    <title>EASY - Create Project</title>
+    <link rel="icon" href="/img/logo.png" type="image/png">
     <link href="/css/excelUpload.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <%- include('../views/templates/sidebar.ejs') %>
@@ -12,69 +14,29 @@
     <div class="main-container">
         <div class="text-container">
             <div class="hero-content">
-                <h1>Upload your excel file</h1>
-                <h2>Please upload the BOM you want to analyze with MOST.</h2>
-                <div class="upload-container">
-                    <form id="uploadForm" action="/upload-excel" method="post" enctype="multipart/form-data">
-                        <div id="dropZone" class="drop-zone">
-                            <p>Drag & drop your file here</p>
-                            <input type="file" name="excelFile" accept=".xlsx, .xls" required>
-                        </div>
-                        <button type="submit" class="cta-button">Upload File</button>
-                    </form>
-                    <!-- Nuevo botón para crear un proyecto en blanco -->
-                    <form id="blankProjectForm" action="/create-blank-project" method="post">
-                        <button type="submit" class="cta-button">Create Blank Project</button>
-                    </form>
+                <!-- Formulario para crear proyectos -->
+                <form id="blankProjectForm" action="/create-blank-project" method="post">
+                    <button type="submit" class="cta-button cta-button-primary">
+                        Create New Project
+                    </button>
+                </form>
+                
+                <!-- Botón para descargar el template de Excel -->
+                <div class="download-container" style="margin-top: 30px; text-align: center;">
+                    <p class="download-text">Do you already have the Excel template? If not, download it below:</p>
+                    <button id="downloadTemplate" class="cta-button cta-button-secondary">
+                        Download Excel Template
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = dropZone.querySelector('input');
-    
-        // Abre el cuadro de selección de archivos al hacer clic en el drop zone
-        dropZone.addEventListener('click', () => {
-            fileInput.click();
-        });
-    
-        // Actualiza el texto del drop zone con el nombre del archivo seleccionado
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                dropZone.querySelector('p').textContent = fileInput.files[0].name;
-            }
-        });
-    
-        // Maneja el evento de arrastre sobre el drop zone
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-    
-        // Elimina la clase dragover cuando se sale del drop zone
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-    
-        // Maneja el evento de soltar un archivo en el drop zone
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                // Asigna el archivo al input y muestra el nombre del archivo
-                fileInput.files = files; // Asegúrate de que esto sea compatible con tu navegador
-                dropZone.querySelector('p').textContent = files[0].name;
-            }
-            dropZone.classList.remove('dragover');
-        });
-    
-        // Evitar que el cuadro de diálogo se abra dos veces
-        dropZone.addEventListener('mousedown', (e) => {
-            // Evita que se dispare el click si se está arrastrando un archivo
-            if (e.detail === 1) { // Solo abrir si es un clic simple
-                fileInput.click();
-            }
+        // JavaScript para manejar el clic en el botón de descarga del template
+        document.getElementById('downloadTemplate').addEventListener('click', () => {
+            const templateUrl = '/path/to/excel/template.xlsx'; 
+            window.location.href = templateUrl;
         });
     </script>    
 </body>

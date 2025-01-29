@@ -170,7 +170,8 @@ tfoot td span {
 .fixed-bottom {
   position: fixed;
   bottom: 0;
-  width: 100%;
+  left: calc(var(--nav-width) + 156px); /* Ajustar el margen izquierdo */
+  width: calc(100% - (var(--nav-width) + 156px)); /* Ajustar el ancho */
   background-color: var(--table-header-bg);
   border-top: 1px solid var(--table-border-color);
   display: flex;
